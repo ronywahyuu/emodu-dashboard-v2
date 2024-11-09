@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { PictureInPicture2, PictureInPicture2Icon, VideoIcon } from "lucide-react";
+import { PictureInPicture2, VideoIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import PiPWindow from "@/context/pip-window";
 import { io } from "socket.io-client";
@@ -41,7 +41,6 @@ export default function MeetingActions({
   const stopRecognition = useStopRecognition();
   const {
     data: meetingData,
-    refetch: refetchMeeting,
   } = useGetMeetingByMeetingCode(meetingCode);
 
 
@@ -175,7 +174,7 @@ export default function MeetingActions({
       //   meetingCode,
       // });
       // setMeetingData(data ?? data[0]);
-      const refetchMeetingData = await refetchMeeting();
+      // const refetchMeetingData = await refetchMeeting();
       // const data = refetchMeetingData.data?.data;
       // if (data) setMeetingData(data);
       // fetchRecognitionOverview(meetingCode, " ");

@@ -19,7 +19,7 @@ const DeleteMeetingDialog = () => {
   const [loading, setLoading] = useState(false);
   const isModalOpen = isOpen && modalType === "deleteMeetingDialog";
   const router = useRouter();
-  const EMOVIEW_CODE = data.meetingCode as string;
+  // const EMOVIEW_CODE = data.meetingCode as string;
   const deleteMeeting = useDeleteMeeting();
   const handleDelete = async () => {
     setLoading(true);

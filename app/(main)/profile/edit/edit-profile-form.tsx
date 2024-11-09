@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -16,7 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { useGetProfile, useUpdateProfile } from '@/hooks/api/user-service-hooks'
 // import { toast } from '@/components/ui/use-toast'
@@ -176,7 +175,7 @@ export function EditProfileForm() {
                 />
               </FormControl>
               <FormDescription>
-                Leave this blank if you don't want to change your password.
+                Leave this blank if you don&apos;t want to change your password.
               </FormDescription>
               <FormMessage />
             </FormItem>

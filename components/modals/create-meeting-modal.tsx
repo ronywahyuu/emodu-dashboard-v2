@@ -109,7 +109,7 @@ const CreateMeetingModal = () => {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field, formState: { errors } }) => (
+                render={({ field}) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-gray-300">
                       Meeting Name (required)

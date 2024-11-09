@@ -1,6 +1,6 @@
 // import LineChart from "../charts/line-chart";
 'use client'
-import { RecognitionsDetail, RecognitionsOverview, RecognitionsSummary } from "@/lib/api/types.recognition";
+// import  { RecognitionsDetail, RecognitionsOverview, RecognitionsSummary } from "@/lib/api/types.recognition";
 // import DoughnutChart from "../charts/doughnut-chart";
 // import LineChart from "../charts/line-chart";
 // import RadarChart from "../charts/radar-chart";
@@ -9,6 +9,7 @@ import LineChart from "@/components/charts/line-chart";
 import RadarChart from "@/components/charts/radar-chart";
 import DoughnutChart from "@/components/charts/doughnut-chart";
 import { Card } from "@/components/ui/card";
+import { RecognitionsDetail, RecognitionsOverview, RecognitionsSummary } from "@/hooks/api/recognition-service-hooks";
 
 interface RecognitionsProps {
   recognitionDetail: RecognitionsDetail;
@@ -21,7 +22,7 @@ export default function Recognitions({
   recognitionDetail,
   recognitionOverview,
   recognitionSummary,
-  withImage = false,
+  // withImage = false,
 }: RecognitionsProps) {
   const pathname = usePathname();
 

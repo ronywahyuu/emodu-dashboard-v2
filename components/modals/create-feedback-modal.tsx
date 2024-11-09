@@ -27,7 +27,7 @@ import Rating from "react-rating-stars-component";
 
 const CreateFeedbackModal = () => {
   const { isOpen, modalType, onClose } = useModalStore();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const isModalOpen = isOpen && modalType === "feedbackDialog";
   const createFeedback = useCreateFeedback();
 

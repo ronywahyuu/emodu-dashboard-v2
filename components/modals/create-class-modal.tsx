@@ -150,7 +150,7 @@ const CreateClassModal = () => {
               <FormField
                 control={form.control}
                 name="defaultMeetingLink"
-                render={({ field, formState: { errors } }) => (
+                render={({ field,  }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-gray-300">
                       Google Meet Link (required)

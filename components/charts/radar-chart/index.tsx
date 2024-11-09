@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { Card } from "@/components/ui/card";
 import { RecognitionsOverview } from "@/hooks/api/recognition-service-hooks";

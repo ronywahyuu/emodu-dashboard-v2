@@ -53,7 +53,7 @@ const EditClassModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("values", values);
 
-    editClass.mutate(values,{
+    editClass.mutate(values, {
       onSuccess: () => {
         router.refresh();
         toast.success("Class updated successfully");
@@ -78,7 +78,7 @@ const EditClassModal = () => {
     //     toast.error("Failed to update class");
 
     //   })
-   
+
   };
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const EditClassModal = () => {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field, formState: { errors } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-primary/80">
                       Class Name (required)
