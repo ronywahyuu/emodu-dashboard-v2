@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/logout/route.js
 import { NextRequest } from 'next/server';
 import { serialize } from 'cookie';

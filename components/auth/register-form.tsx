@@ -16,6 +16,7 @@ import { z } from 'zod'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from 'axios';
+import { toast } from "sonner"
 
 const BASE_URL = process.env.API_URL
 
@@ -27,6 +28,7 @@ const formSchema = z.object({
 })
 
 export function RegisterForm() {
+  // const { data: profileData, isPending } = useGetProfile();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,7 +40,23 @@ export function RegisterForm() {
     },
   })
 
+  // if (isPending) {
+  //   return <p>Loading...</p>
+  // }
+
+  // if (profileData?.success) {
+  //   window.location.href = '/dashboard'
+  // }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // password confirmation
+    if (values.password !== values.passwordConfirmation) {
+      return form.setError('passwordConfirmation', {
+        type: 'manual',
+        message: 'Password confirmation does not match'
+      })
+    }
+
     try {
       const payload = {
         email: values.email,
@@ -46,7 +64,17 @@ export function RegisterForm() {
         fullname: values.fullname
       }
       const response = await axios.post(`${BASE_URL}/auth/register`, payload)
-      console.log(response.data)
+      // console.log(response.)
+      if (response.status === 201) {
+        toast.success('Account created successfully')
+
+        setTimeout(() => {
+          window.location.href = '/login'
+        }, 2000)
+
+        // window.location.href = '/login'
+      }
+
     } catch (error) {
       console.log(error)
     }
@@ -61,8 +89,8 @@ export function RegisterForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 mb-3">
-          <FormField
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mb-3">
+            <FormField
               control={form.control}
               name="fullname"
               render={({ field }) => (
@@ -97,7 +125,7 @@ export function RegisterForm() {
                   <FormControl>
                     <Input
                       type="password"
-                    placeholder="" {...field} />
+                      placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,25 +140,22 @@ export function RegisterForm() {
                   <FormControl>
                     <Input
                       type="password"
-                    placeholder="" {...field} />
+                      placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" className="w-full bg-blue-500 text-white font-bold">Submit</Button>
           </form>
         </Form>
 
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="underline w-full">
-            Sign up
+          Already have an account?{" "}
+          <Link href="/login" className="underline w-full">
+            Sign in
           </Link>
 
-          <Link href="/protected" className="underline w-full">
-            Protected
-          </Link>
         </div>
       </CardContent>
     </Card>

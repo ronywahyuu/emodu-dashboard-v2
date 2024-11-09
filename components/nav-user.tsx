@@ -6,7 +6,7 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Sparkles,
+  User2Icon,
 } from "lucide-react"
 
 import {
@@ -30,6 +30,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useGetProfile } from "@/hooks/api/user-service-hooks"
+import { Skeleton } from "./ui/skeleton"
+import Link from "next/link"
 
 export function NavUser({
   user,
@@ -45,11 +47,14 @@ export function NavUser({
   const {
     data: currentUser,
     isLoading,
-    isError,
-    error,
   } = useGetProfile()
 
+  if (isLoading) return <Skeleton className="w-full h-10" />
+
+
   const initials = currentUser?.data.fullname ? currentUser?.data.fullname.split(' ').map((n) => n[0]).join('') : 'C'
+
+
 
   return (
     <SidebarMenu>
@@ -91,10 +96,13 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
+              <Link href="/profile/edit">
+                <DropdownMenuItem>
+                  <User2Icon />
+
+                  Update Profile
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>

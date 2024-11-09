@@ -8,17 +8,12 @@ export default async function ProtectedPage() {
   if (!accessToken) {
     redirect('/'); // Redirect to the root page
   }
-  const getClass = await axios.get('http://localhost:8080/api/v2/class', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
 
-  console.log(getClass.data)
+  // console.log(getClass.data)
 
   
 
-  console.log(accessToken)
+  // console.log(accessToken)
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
       <h1>Protected Page</h1>
