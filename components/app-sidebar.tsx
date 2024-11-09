@@ -4,17 +4,13 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
-  Command,
   Frame,
-  LifeBuoy,
   Map,
   PieChart,
-  Send,
   Settings2,
   SquareTerminal,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -28,9 +24,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
-import { useGetClass } from "@/hooks/api/class-service-hooks"
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
 const data = {
   user: {
     name: "shadcn",
@@ -125,43 +118,48 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
+    // {
+    //   title: "Support",
+    //   url: "#",
+    //   icon: LifeBuoy,
+    // },
+    // {
+    //   title: "Feedback",
+    //   url: "#",
+    //   icon: Send,
+    // },
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "Dashboard",
+      url: "/dashboard",
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
+      name: "Class",
+      url: "/class",
       icon: PieChart,
     },
     {
-      name: "Travel",
-      url: "#",
+      name: "Emodu Extension",
+      url: "/get-extension",
       icon: Map,
     },
   ],
 }
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {}
+// interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> { }
 
-export function AppSidebar({ ...props }:AppSidebarProps) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const { data: classes, isLoading, error } = useGetClass();
+  // const {
+  //   data: currentUser,
+  //   isLoading,
+  //   isError,
+  //   error,
+  // } = useGetProfile()
 
-  console.log('classes', classes);
+  // console.log('classes', classes);
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -170,26 +168,28 @@ export function AppSidebar({ ...props }:AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                  <Image
-                    src={"/images/logo.svg"}
-                    width={100}
-                    height={100}
-                    alt="Emoview logo"
-                  />
+                <Image
+                  src={"/images/logo.svg"}
+                  width={100}
+                  height={100}
+                  alt="Emoview logo"
+                />
                 {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <Command className="size-4" />
                 </div> */}
-                {/* <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Emodu</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div> */}
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  {/* <span className="truncate font-semibold">s</span> */}
+                  <span className="truncate text-xs text-gray-400">
+                    Version 2.0.0
+                  </span>
+                </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        {/* <NavMain items={data.navMain} /> */}
         <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>

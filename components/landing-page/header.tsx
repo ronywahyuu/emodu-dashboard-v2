@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-// import { useUser } from "@auth0/nextjs-auth0/client";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -17,6 +17,8 @@ import { Skeleton } from "../ui/skeleton";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Separator } from "../ui/separator";
+import useProfile from "@/hooks/user/useGetProfile";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const NavLink = ({ text, link }: { text: string; link: string }) => (
   <li>
@@ -31,10 +33,8 @@ const NavLink = ({ text, link }: { text: string; link: string }) => (
 
 
 export default function Header() {
-  // const { user, isLoading } = useUser();
+  const { profile, loading } = useProfile();
   const { theme, setTheme } = useTheme()
-
-
   const navLinks = [
     {
       name: "About",
@@ -44,11 +44,23 @@ export default function Header() {
       name: "Contact",
       url: "/contact",
     },
+
+    {
+      name: "Get Extension",
+      url: "/get-extension",
+    },
+
     {
       name: "Dashboard",
       url: "/dashboard",
     },
   ];
+
+  // if(loading){
+  //   return <Skeleton className="w-10 h-10 rounded-full" />
+  // }
+
+  // console.log('profile', profile);
 
   return (
     <header className="bg-white dark:bg-gray-800 bg-opacity-40 dark:bg-opacity-10 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 ease-in-out py-3 ">
@@ -86,15 +98,15 @@ export default function Header() {
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
                 {theme === 'dark' ? <Sun /> : <Moon />}
               </Button>
-              <Link 
+              {/* <Link
                 href="/login"
               >
                 <Button variant="default" className="rounded">Login</Button>
-              </Link>
+              </Link> */}
 
-              {/* {isLoading ? (
+              {loading ? (
                 <Skeleton className="w-10 h- rounded-full" />
-              ) : !user ? (
+              ) : !profile ? (
                 <>
                   <Link
                     href="/login"
@@ -102,19 +114,13 @@ export default function Header() {
                   >
                     Login
                   </Link>
-                  <Link
-                    href="/login-v2"
-                    className="bg-[#61b0fa] text-white rounded-md px-5  py-2.5 text-sm font-medium shadow"
-                  >
-                    Login v2
-                  </Link>
                 </>
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger>
                     <Avatar>
                       <AvatarImage
-                        src={user?.picture as string}
+                        src={profile?.avatar as any}
                         alt="Avatar picture"
                       />
                       <AvatarFallback>
@@ -133,16 +139,23 @@ export default function Header() {
                         <span>Dark Mode</span>
                       </DropdownMenuItem>
 
-                      <a href="api/auth/logout">
-                        <DropdownMenuItem className="cursor-pointer">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Logout</span>
-                        </DropdownMenuItem>
-                      </a>
+                      <DropdownMenuItem className="cursor-pointer"
+                        onClick={() => {
+                          fetch("/api/logout", {
+                            method: "POST",
+                          }).then(() => {
+                            window.location.href = "/"
+                          })
+                        }}                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
+                      </DropdownMenuItem>
+                      {/* <a href="api/auth/logout">
+                      </a> */}
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )} */}
+              )}
             </div>
 
             {/* Mobile menu button code here */}

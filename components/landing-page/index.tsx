@@ -6,7 +6,7 @@ import Header from "./header";
 import Link from "next/link";
 import { Card, CardContent } from "../ui/card";
 
-export default function LandingPage() {
+export default async function LandingPage() {
   return (
     <div className="bg-[url('/bg-2.svg')] bg-cover bg-center bg-no-repeat bg-fixed ">
       <Header />
