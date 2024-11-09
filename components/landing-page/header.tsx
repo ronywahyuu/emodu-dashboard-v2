@@ -52,7 +52,7 @@ export default function Header() {
 
     {
       name: "Dashboard",
-      url: "/dashboard",
+      url: "/class",
     },
   ];
 

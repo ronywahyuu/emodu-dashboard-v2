@@ -67,7 +67,8 @@ export default function MeetingActions({
     requestPipWindow(pipWindowWidth, pipWindowHeight);
   }, [requestPipWindow]);
 
-  const baseURL = process.env.API_URL;
+  const baseURL = process.env.NEXT_PUBLIC_API_URL;
+  // const baseURL = 'http://localhost:8080';
 
   const socket = io(baseURL as string, {
     transports: ["websocket"],

@@ -18,7 +18,7 @@ export default async function LandingPage() {
               <h1 className="text-4xl font-extrabold">Connect and Learn with</h1>
               <h3 className="text-xl font-medium mt-3">Emodu: A video conferencing platform with deep emotion understanding for everyone</h3>
               <div className="flex justify-center md:justify-start gap-4 mt-8">
-                <Link href="/dashboard">
+                <Link href="/class">
                   <Button className="m block w-full rounded-full bg-[#4ea1ef] px-12 py-3 text-sm  text-white drop-shadow-md hover:bg-blue-900 shadow-2xl focus:outline-none focus:ring active:bg-red-500 sm:w-auto font-bold">
                     Let&apos;s Go!
                   </Button>

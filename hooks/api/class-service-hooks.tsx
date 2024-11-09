@@ -4,7 +4,7 @@ import apiClient from "@/lib/axios-instance";
 import { AxiosError } from "axios";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-const BASE_URL = process.env.API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
 export interface ClassData {
