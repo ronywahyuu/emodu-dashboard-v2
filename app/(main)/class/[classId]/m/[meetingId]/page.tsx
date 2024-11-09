@@ -20,7 +20,7 @@ import Recognitions from '../components/recognitions'
 import Participants from '../components/participants'
 import { useGetProfile } from '@/hooks/api/user-service-hooks'
 import NotAuthorizedPageComponent from '../components/not-authorized'
-import EmovalaroRecognition from '../components/emovalaro-recognition'
+// import EmovalaroRecognition from '../components/emovalaro-recognition'
 
 interface MeetingDetailPageProps {
   params: {
