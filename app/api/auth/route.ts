@@ -4,7 +4,8 @@ import { serialize } from 'cookie'; // Pastikan untuk mengimpor serialize dari c
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
-  const response = await fetch('http://localhost:8080/api/v2/auth/login', {
+  // const response = await fetch('http://localhost:8080/api/v2/auth/login', {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

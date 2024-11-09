@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import Link from "next/link"
 
@@ -16,6 +17,7 @@ import { z } from 'zod'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from 'axios';
+// import { useGetProfile } from "@/hooks/api/user-service-hooks"
 
 
 const formSchema = z.object({
@@ -52,12 +54,13 @@ export function LoginForm() {
       if (response.data.success) {
         window.location.href = '/dashboard'
       }
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      // console.log(error)
+      // th
 
       form.setError('email', {
         type: 'manual',
-        message: 'Invalid email or password'
+        message: `Invalid email or password : ${error.response.data.message}`
       })
     }
   }
