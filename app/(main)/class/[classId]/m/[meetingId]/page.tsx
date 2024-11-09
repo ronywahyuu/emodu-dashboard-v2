@@ -195,7 +195,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
         <Tabs defaultValue="recognition" className="w-full">
           <TabsList>
             <TabsTrigger value="recognition">Recognition (Face-api.js)</TabsTrigger>
-            <TabsTrigger value="recognition-rangga">Recognition (EmoValaro7)</TabsTrigger>
+            {/* <TabsTrigger value="recognition-rangga">Recognition (EmoValaro7)</TabsTrigger> */}
             {/* <TabsTrigger value="valencearousal">Valence Arousal Data</TabsTrigger> */}
             <TabsTrigger value="participants">Participants</TabsTrigger>
           </TabsList>
@@ -217,25 +217,13 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
               />
             )}
           </TabsContent>
-          <TabsContent value="recognition-rangga">
+          {/* <TabsContent value="recognition-rangga">
             {recognitionsDataPending ? (
               <Skeleton className="w-full h-screen" />
             ) : (
-              // <div>w</div>
               <EmovalaroRecognition />
-              // <Recognitions
-              //   recognitionDetail={
-              //     recognitionsData?.data.recognitionsDetail as RecognitionsDetail
-              //   }
-              //   recognitionOverview={
-              //     recognitionsData?.data.recognitionsOverview as RecognitionsOverview
-              //   }
-              //   recognitionSummary={
-              //     recognitionsData?.data.recognitionsSummary as RecognitionsSummary
-              //   }
-              // />
             )}
-          </TabsContent>
+          </TabsContent> */}
           <TabsContent value="participants">
             {/* {!recognitionsDataPending ? (
               <div className="flex flex-col items-center  min-h-[60vh] justify-center space-y-3">

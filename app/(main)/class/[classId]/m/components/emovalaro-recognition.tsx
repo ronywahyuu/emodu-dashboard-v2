@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,12 +36,12 @@ const emotionDataList = [
 ]
 
 // Aggregate data
-const aggregateData = (data) => {
-  const emotionCounts = {};
+const aggregateData = (data: any[]) => {
+  const emotionCounts: { [key: string]: number } = {};
   let totalArousal = 0;
   let totalValence = 0;
 
-  data.forEach(item => {
+  data.forEach((item: { emotion: string | number; arousal: number; valence: number }) => {
     emotionCounts[item.emotion] = (emotionCounts[item.emotion] || 0) + 1;
     totalArousal += item.arousal;
     totalValence += item.valence;
