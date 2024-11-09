@@ -1,7 +1,8 @@
 'use client'
 import ActionTooltip from '@/components/action-tooltip';
 import { Card } from '@/components/ui/card';
-import { RecognitionsSummary } from '@/lib/api/types.recognition';
+import { RecognitionsSummary } from '@/hooks/api/recognition-service-hooks';
+// import { RecognitionsSummary } from '@/lib/api/types.recognition';
 import {
   ArcElement,
   CategoryScale,

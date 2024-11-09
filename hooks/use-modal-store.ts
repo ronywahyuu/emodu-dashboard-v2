@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 export type ModalType =
   | "createClass"
@@ -61,7 +62,7 @@ export interface ModalStore {
 export const useModalStore = create<ModalStore>((set) => ({
   modalType: "createClass",
   isOpen: false,
-  data: {},
+  data: {} as ModalData & MeetingModalData & ClassModalData & FeedbackModalData,
   onOpen: (type, data = {}) => set({ isOpen: true, modalType: type, data }),
   onClose: () => set({ isOpen: false }),
   setModalType: (type) => set({ modalType: type }),

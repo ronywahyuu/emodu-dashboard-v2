@@ -110,7 +110,7 @@ const CreateFeedbackModal = () => {
                         activeColor="#ffd700"
                         emptyIcon={<i className="far fa-star"></i>}
                         halfIcon={<i className="fa fa-star-half-alt"></i>}
-                        fullIcon={<i className="fa fa-star"></i>}
+                        // fullIcon={<i className="fa fa-star"></i>}
                         {...field}
                         onChange={(newValue: string | number) => field.onChange(newValue)}
                       />
