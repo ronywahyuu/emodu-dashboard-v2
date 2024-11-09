@@ -1,9 +1,7 @@
 import { BaseResponse } from "@/constants/types";
 import apiClient from "@/lib/axios-instance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 
-const BASE_URL = process.env.API_URL;
 
 
 
@@ -18,6 +16,14 @@ export interface Data {
   updatedAt: string
 }
 
+export interface UpdateProfileDto {
+  id?: string
+  email?: string
+  fullName?: string
+  avatar?: string
+  password?: string
+}
+
 type GetProfileResponse = BaseResponse<Data>
 
 
@@ -28,5 +34,17 @@ export const useGetProfile = () => {
       return apiClient.get('/auth/profile')
         .then((res) => res.data);
     },
+  })
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn :  (data: UpdateProfileDto) => {
+      return apiClient.patch('/users/update', data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries()
+    }
   })
 };
