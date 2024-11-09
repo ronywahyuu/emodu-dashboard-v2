@@ -24,7 +24,9 @@ const formSchema = z.object({
 })
 
 export function LoginForm() {
-
+  
+  // const { data: profileData, isPending } = useGetProfile();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,16 +34,31 @@ export function LoginForm() {
       password: '',
     },
   })
+  
+  // if (isPending) {
+  //   return <p>Loading...</p>
+  // }
+
+  // console.log('profileData', profileData)
+  // if(profileData?.success){
+  //   window.location.href = '/dashboard'
+  // }
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const response = await axios.post(`/api/auth`, values)
 
-      if(response.data.success){
+      if (response.data.success) {
         window.location.href = '/dashboard'
       }
     } catch (error) {
       console.log(error)
+
+      form.setError('email', {
+        type: 'manual',
+        message: 'Invalid email or password'
+      })
     }
   }
   return (
@@ -54,7 +71,9 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 mb-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mb-3">
+            <FormMessage />
+
             <FormField
               control={form.control}
               name="email"
@@ -62,7 +81,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="m@example.com" {...field} />
+                    <Input placeholder="emodu@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,13 +96,16 @@ export function LoginForm() {
                   <FormControl>
                     <Input
                       type="password"
-                    placeholder="" {...field} />
+                      placeholder="*********" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting} className="border w-full bg-blue-600 text-white font-bold">
+              {
+                form.formState.isSubmitting ? 'Signing in...' : 'Login'
+              }</Button>
           </form>
         </Form>
 
@@ -93,9 +115,9 @@ export function LoginForm() {
             Sign up
           </Link>
 
-          <Link href="/protected" className="underline w-full">
+          {/* <Link href="/protected" className="underline w-full">
             Protected
-          </Link>
+          </Link> */}
         </div>
       </CardContent>
     </Card>
