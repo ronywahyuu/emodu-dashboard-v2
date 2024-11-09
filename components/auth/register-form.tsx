@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import Link from "next/link"
 
@@ -75,8 +76,9 @@ export function RegisterForm() {
         // window.location.href = '/login'
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
+      toast.error(error.response.data.message)
     }
   }
   return (

@@ -52,15 +52,15 @@ export function LoginForm() {
       const response = await axios.post(`/api/auth`, values)
 
       if (response.data.success) {
-        window.location.href = '/dashboard'
+        window.location.href = '/class'
       }
     } catch (error: any) {
-      // console.log(error)
+      console.log(error)
       // th
 
       form.setError('email', {
         type: 'manual',
-        message: `Invalid email or password : ${error.response.data.message}`
+        message: `Invalid email or password `
       })
     }
   }

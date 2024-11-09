@@ -106,7 +106,7 @@ const CreateFeedbackModal = () => {
                       <Rating
                         count={5}
                         size={24}
-                        isHalf={true}
+                        // isHalf={true}
                         activeColor="#ffd700"
                         emptyIcon={<i className="far fa-star"></i>}
                         halfIcon={<i className="fa fa-star-half-alt"></i>}

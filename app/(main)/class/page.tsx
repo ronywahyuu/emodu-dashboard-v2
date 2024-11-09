@@ -15,12 +15,12 @@ import { Loader2, LogInIcon, PlusIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ClassData, useGetClass } from '@/hooks/api/class-service-hooks'
 import ClassCard from './components/class-card'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+// import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useModalStore } from '@/hooks/use-modal-store'
 function ClassPage() {
   const { onOpen } = useModalStore()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedOption, setSelectedOption] = useState('all')
+  // const [selectedOption, setSelectedOption] = useState('all')
   const {
     data: classesResponse,
     isLoading,
@@ -85,7 +85,7 @@ function ClassPage() {
           </div>
         </div>
 
-        <div className='flex items-center gap-3'>
+        {/* <div className='flex items-center gap-3'>
           <span>
             Filter by:
           </span>
@@ -106,7 +106,7 @@ function ClassPage() {
               </SelectGroup>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
 
         {/* LIST OF CLASSES */}
         <div className=''>

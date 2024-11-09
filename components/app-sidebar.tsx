@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
-  Frame,
+  // Frame,
   Map,
   PieChart,
   Settings2,
@@ -130,11 +130,11 @@ const data = {
     // },
   ],
   projects: [
-    {
-      name: "Dashboard",
-      url: "/dashboard",
-      icon: Frame,
-    },
+    // {
+    //   name: "Dashboard",
+    //   url: "/dashboard",
+    //   icon: Frame,
+    // },
     {
       name: "Class",
       url: "/class",
