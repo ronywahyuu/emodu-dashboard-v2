@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import axios from 'axios';
 import { toast } from "sonner"
 
-const BASE_URL = process.env.API_URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 const formSchema = z.object({
   fullname: z.string().min(3),
