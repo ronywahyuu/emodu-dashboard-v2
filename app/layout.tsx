@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
+import NextTopLoader from "nextjs-toploader";
+import { PiPProvider } from "@/context/pip-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,19 +29,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+      <PiPProvider>
 
-          {children}
-        </ThemeProvider>
-      </body>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <NextTopLoader
+            showSpinner={false}
+            color="gray"
+            crawlSpeed={100}
+          />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+
+            {children}
+          </ThemeProvider>
+          <Toaster richColors />
+        </body>
+      </PiPProvider>
     </html>
   );
 }
