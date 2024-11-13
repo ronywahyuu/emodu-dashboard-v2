@@ -113,8 +113,10 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
               </h1>
             </div>
             <div className="flex gap-2">
-              <KeyRound /> :
-              {params.meetingId}
+              <KeyRound /> {":"}
+              <span>
+                {params.meetingId}
+              </span>
               {/* {isCopyEmoviewCodeSuccess ? (
                 "✅ Copied"
               ) : (
