@@ -5,12 +5,13 @@ import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+  MeetingData,
   useGetMeetingByMeetingCode,
   useToggleStartMeeting
 } from '@/hooks/api/meeting-service-hooks'
 import { RecognitionsDetail, RecognitionsOverview, RecognitionsSummary, useGetRecognitionByMeetingCode } from '@/hooks/api/recognition-service-hooks'
 import {
-  KeyRound, Link, Text, Video,
+  KeyRound, Link, Loader2, Text, Video,
 } from 'lucide-react'
 import React from 'react'
 import MeetingActions from '../components/meeting-action'
@@ -20,6 +21,7 @@ import Recognitions from '../components/recognitions'
 import Participants from '../components/participants'
 import { useGetProfile } from '@/hooks/api/user-service-hooks'
 import NotAuthorizedPageComponent from '../components/not-authorized'
+import { BaseResponse } from '@/constants/types'
 // import EmovalaroRecognition from '../components/emovalaro-recognition'
 
 interface MeetingDetailPageProps {
@@ -54,11 +56,18 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
 
   }
 
+  if (meetingDataPending || recognitionsDataPending) {
+    return <Skeleton className="w-full h-screen" />
+  }
+
   if (!isOwner) {
     return (
       <NotAuthorizedPageComponent />
     )
   }
+
+  // console.log('meetingData', meetingData)
+
 
   return (
     <>
@@ -152,6 +161,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
             meetingData?.data.isStarted ? (
               <MeetingActions
                 recognitionsData={recognitionsData as any}
+                meetingData={meetingData as BaseResponse<MeetingData>}
                 errorState={recognitionsDataError}
                 meetingCode={params.meetingId}
                 isEnded={meetingData.data.isEnded}
@@ -201,7 +211,10 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
           </TabsList>
           <TabsContent value="recognition">
             {recognitionsDataPending ? (
-              <Skeleton className="w-full h-screen" />
+              // <Skeleton className="w-full h-screen" />
+              <div className="flex justify-center items-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              </div>
             ) : (
               // <div>w</div>
               <Recognitions

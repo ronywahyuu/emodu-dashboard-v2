@@ -43,12 +43,12 @@ const DoughnutChart = ({ data, height = 400, width = 400 }: DoughnutChartProps) 
   const defaultHeight = 400;
   const isPipMode = width !== defaultWidth && height !== defaultHeight;
   const chartData = {
-    labels: data.labels,
+    labels: data?.labels,
     // labels: ['Positive', 'Negative'],
     datasets: [
       {
         label: 'Recognition',
-        data: data.datas,
+        data: data?.datas,
         // data: {
         //   Recognition: 10,
         //   'Non-Recognition': 20,
@@ -74,18 +74,18 @@ const DoughnutChart = ({ data, height = 400, width = 400 }: DoughnutChartProps) 
   };
 
   const emoji = () => {
-    if (!data.datas.length) return '';
-    else if (data.datas.includes(NaN)) return '😐';
+    if (!data?.datas.length) return '';
+    else if (data?.datas.includes(NaN)) return '😐';
     // else if (data.datas.includes(NaN)) return <span className={`${(width !== defaultWidth && height !== defaultHeight) ? 'text-sm' : ''}`}>😐</span>;
-    else if (data.datas[0] > data.datas[1]) return '🙂';
+    else if (data?.datas[0] > data.datas[1]) return '🙂';
     // else if (data.datas[0] > data.datas[1]) return <span className={`${(width !== defaultWidth && height !== defaultHeight) ? 'text-sm' : ''}`}>🙂</span>;
     else return '🙁';
   };
 
   const generateTooltipLabelByEmoji = () => {
-    if (!data.datas.length) return '';
-    else if (data.datas.includes(NaN)) return '😐';
-    else if (data.datas[0] > data.datas[1]) return 'Keep it up! 😉';
+    if (!data?.datas.length) return '';
+    else if (data?.datas.includes(NaN)) return '😐';
+    else if (data?.datas[0] > data.datas[1]) return 'Keep it up! 😉';
     else return 'Hope you okay! 😔';
   }
 

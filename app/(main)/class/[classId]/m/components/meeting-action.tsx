@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { PictureInPicture2, VideoIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { ChartPie, ChevronDown, ChevronUp, PictureInPicture2, School2, Search, Users, VideoIcon } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import PiPWindow from "@/context/pip-window";
 import { io } from "socket.io-client";
 // import {
@@ -14,19 +14,24 @@ import { io } from "socket.io-client";
 import ActionTooltip from "@/components/action-tooltip";
 import { Button } from "@/components/ui/button";
 import { usePiPWindow } from "@/context/pip-provider";
-// import RadarChart from "@/components/charts/radar-chart";
 import DoughnutChart from "@/components/charts/doughnut-chart";
 import { Switch } from "@/components/ui/switch";
 import { RecognitionData, useSelectRecognitionModel, useStartRecognition, useStopRecognition } from "@/hooks/api/recognition-service-hooks";
-import { useGetMeetingByMeetingCode } from "@/hooks/api/meeting-service-hooks";
+import { MeetingData, useGetMeetingByMeetingCode } from "@/hooks/api/meeting-service-hooks";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { BaseResponse } from "@/constants/types";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { formatName } from "@/lib/utils";
 
 interface MeetingActionsProps {
-  recognitionsData: RecognitionData;
+  recognitionsData: BaseResponse<RecognitionData>;
+  meetingData: BaseResponse<MeetingData>;
   errorState: any;
   meetingCode: string;
   isEnded: boolean | undefined;
@@ -43,8 +48,14 @@ export default function MeetingActions({
     data: meetingData,
   } = useGetMeetingByMeetingCode(meetingCode);
 
+  const [showParticipants, setShowParticipants] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
-
+  const filteredParticipants = useMemo(() => {
+    return meetingData?.data.participants.filter(participant =>
+      participant.user.fullname.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [meetingData?.data.participants, searchQuery])
   // const [selectedModel, setSelectedModel] = useState("default");
 
 
@@ -129,21 +140,21 @@ export default function MeetingActions({
     });
   };
 
-  // const recognitionComponent = (
-  //   <RadarChart data={recognitionsData.recognitionsOverview} />
-  // );
 
-  const recognitionPieComponent = <DoughnutChart data={recognitionsData.recognitionsSummary} width={pipWindowWidth} height={pipWindowHeight} />;
+  console.log('recognitionsData', recognitionsData.data.recognitionsSummary)
+
+  const recognitionPieComponent = <DoughnutChart data={recognitionsData.data.recognitionsSummary} width={pipWindowWidth} height={pipWindowHeight} />;
+  // const recognitionComponent = <RadarChart data={recognitionsData.data.recognitionsOverview} />;
 
   const handleToggleRecognition = async (checked: boolean) => {
     // Optimistically update the state
     setIsRecognitionSwitchedOn(checked);
-  
+
     if (selectedModel === 'NONE') {
       toast.error("Please select a model");
       return;
     }
-  
+
     if (checked) {
       await startRecognition.mutateAsync(meetingData?.data.meetingCode as string, {
         onSuccess: () => {
@@ -211,7 +222,7 @@ export default function MeetingActions({
     <>
       <div className="flex items-center">
         {!isEnded ? (
-          <Card className="w-full max-w-xl bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm">
+          <Card className="w-full  bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="space-y-6">
                 {/* Model Selection */}
@@ -318,19 +329,124 @@ export default function MeetingActions({
 
       {pipWindow && (
         <PiPWindow pipWindow={pipWindow}>
-          <div className="pipRoot max-w-sm h-10" style={{
-            // width: "100%",
-            // height: "100%",
-            // display: "flex",
-            // justifyContent: "center",
-            // alignItems: "center",
-            // backgroundColor: "rgba(255, 255, 255, 0.9)",
-            // relative dark mode
-            // backgroundColor: "rgba(0, 0, 0, 0.9)",
+          <div className="pipRoot max-w-sm h-auto bg-white dark:bg-neutral-900 shadow-lg rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <h1 className="text-center text-lg font-semibold text-gray-800 dark:text-gray-200">
+                Picture-in-Picture
+              </h1>
+            </div>
+            <div className="p-4">
+              <div className="flex">
+                <div className="flex items-center space-x-2 mb-4">
+                  <span className="text-gray-600 dark:text-gray-400">Recognition Status</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600 dark:text-gray-400">:</span>
+                    {/* <span className="text-green-600 dark:text-green-400">
+                    </span> */}
+                    {isRecognitionSwitchedOn ? <Badge
+                      variant="outline"
+                      className="bg-green-600 text-white border-none animate-pulse p-2 px-3 flex items-center gap-2"
+                    >
+                      <VideoIcon className="w-5" />
+                      <p className="text-xs">
 
-          }}>
-            {/* {recognitionComponent} */}
-            {recognitionPieComponent}
+                        Running
+                      </p>
+                    </Badge> : (
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-500 text-white border-none p-2 px-3 flex items-center gap-2"
+                      >
+                        <VideoIcon className="w-5" />
+                        <p className="text-xs">
+
+                          Stopped
+                        </p>
+                      </Badge>
+                    )}
+
+
+                  </div>
+                </div>
+
+              </div>
+              <div className="flex gap-2 justify-between">
+                <button
+                  onClick={() => setShowParticipants(!showParticipants)}
+                  className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:underline focus:outline-none"
+                  aria-label={showParticipants ? "Hide participants list" : `View ${meetingData?.data.participants.length} participants`}
+                >
+                  <Users className="w-5 h-5" />
+                  <span>{meetingData?.data.participants.length}</span>
+                  {showParticipants ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                <ActionTooltip label="Meeting name">
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                    <School2 className="w-5 h-5" />
+                    <span>{meetingData?.data.name}</span>
+                  </div>
+                </ActionTooltip>
+              </div>
+
+
+
+              <div className="mt-4">
+                {showParticipants ? (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        type="text"
+                        placeholder="Search participants..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-8 w-full"
+                      />
+                    </div>
+                    <ScrollArea className="h-[200px]">
+                      {filteredParticipants?.map((participant) => (
+                        <div
+                          key={participant.user.id}
+                          className="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          {/* <Users className="w-4 h-4" /> */}
+                          <Avatar className="w-5 ">
+                            <AvatarImage src={participant.user.avatar} alt={participant.user.fullname} />
+                          </Avatar>
+                          <div className="w-full flex items-center justify-between">
+                            <span>
+                              {/* {participant.user.fullname} */}
+                              {formatName(participant.user.fullname)}
+                            </span>
+
+                            <span className="text-gray-500 text-xs dark:text-gray-400 flex items-center gap-2">
+                              <ChartPie className="w-4 h-4" />
+                              Happy
+                              {/* {participant.user.email} */}
+                            </span>
+
+                          </div>
+                        </div>
+                      ))}
+                      {filteredParticipants?.length === 0 && (
+                        <div className="p-2 text-center text-gray-500">
+                          No participants found
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </div>
+                ) : (
+                  recognitionPieComponent
+                )}
+              </div>
+            </div>
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+              >
+                Back to Main Window
+              </button>
+            </div>
           </div>
         </PiPWindow>
       )}
