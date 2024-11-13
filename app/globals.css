@@ -92,3 +92,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+.pipRoot {
+  position: relative;
+  z-index: 50;
+}
