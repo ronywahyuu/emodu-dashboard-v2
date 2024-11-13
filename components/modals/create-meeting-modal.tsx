@@ -25,12 +25,14 @@ import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import { useModalStore } from "@/hooks/use-modal-store";
 import { useCreateMeeting } from "@/hooks/api/meeting-service-hooks";
+import { useState } from "react";
 
 const CreateMeetingModal = () => {
   const { isOpen, modalType, onClose, data } = useModalStore();
   const isModalOpen = isOpen && modalType === "createMeeting";
   const router = useRouter();
   const createMeeting = useCreateMeeting()
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     name: z.string().min(2, {
@@ -58,17 +60,22 @@ const CreateMeetingModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // console.log(values)
+    setLoading(true);
     createMeeting.mutate({
       ...values,
       classId: data.classId as string
     }, {
       onSuccess: () => {
+        form.reset();
         router.refresh();
+        
         toast.success("Meeting created successfully");
+        setLoading(false);
         handleClose();
       },
       onError: () => {
         toast.error("Failed to create meeting");
+        setLoading(false);
       }
     })
     // await createMeeting({
@@ -192,10 +199,15 @@ const CreateMeetingModal = () => {
                 // disabled={
                 //   !form.formState.isValid || form.formState.isSubmitting
                 // }
+                disabled={
+                  form.formState.isSubmitting
+                }
                 className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
 
               >
-                Create
+                {/* Create */}
+                {loading ? "Creating..." : "Create"}
+
               </Button>
             </DialogFooter>
           </form>

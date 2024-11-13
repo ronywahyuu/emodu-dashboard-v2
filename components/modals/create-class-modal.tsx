@@ -68,7 +68,8 @@ const CreateClassModal = () => {
         onClose();
       },
       onError: () => {
-        toast.error("Failed to create class");
+        toast.error("Failed to create class");  
+        setLoading(false);
       }
     })
     // createClassAction({
