@@ -11,13 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { z } from 'zod'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from 'axios';
-// import { useGetProfile } from "@/hooks/api/user-service-hooks"
+import { useGetProfile } from "@/hooks/api/user-service-hooks"
 
 
 const formSchema = z.object({
@@ -27,7 +26,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
   
-  // const { data: profileData, isPending } = useGetProfile();
+  const { data: profileData, isPending } = useGetProfile();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,14 +36,14 @@ export function LoginForm() {
     },
   })
   
-  // if (isPending) {
-  //   return <p>Loading...</p>
-  // }
+  if (isPending) {
+    return <p>Loading...</p>
+  }
 
-  // console.log('profileData', profileData)
-  // if(profileData?.success){
-  //   window.location.href = '/dashboard'
-  // }
+  console.log('profileData', profileData)
+  if(profileData?.success){
+    window.location.href = '/class'
+  }
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
