@@ -16,7 +16,6 @@ import { z } from 'zod'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from 'axios';
-import { useGetProfile } from "@/hooks/api/user-service-hooks"
 
 
 const formSchema = z.object({
@@ -26,7 +25,6 @@ const formSchema = z.object({
 
 export function LoginForm() {
   
-  const { data: profileData, isPending } = useGetProfile();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,16 +34,6 @@ export function LoginForm() {
     },
   })
   
-  if (isPending) {
-    return <p>Loading...</p>
-  }
-
-  console.log('profileData', profileData)
-  if(profileData?.success){
-    window.location.href = '/class'
-  }
-
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const response = await axios.post(`/api/auth`, values)
