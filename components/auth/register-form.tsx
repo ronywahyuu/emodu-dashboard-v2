@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { z } from 'zod'
 import { useForm } from "react-hook-form"
@@ -29,8 +28,6 @@ const formSchema = z.object({
 })
 
 export function RegisterForm() {
-  // const { data: profileData, isPending } = useGetProfile();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,16 +38,8 @@ export function RegisterForm() {
     },
   })
 
-  // if (isPending) {
-  //   return <p>Loading...</p>
-  // }
-
-  // if (profileData?.success) {
-  //   window.location.href = '/dashboard'
-  // }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // password confirmation
     if (values.password !== values.passwordConfirmation) {
       return form.setError('passwordConfirmation', {
         type: 'manual',
@@ -68,11 +57,10 @@ export function RegisterForm() {
       // console.log(response.)
       if (response.status === 201) {
         toast.success('Account created successfully')
-
+        // setIsLoading(false)
         setTimeout(() => {
           window.location.href = '/login'
         }, 2000)
-
         // window.location.href = '/login'
       }
 
@@ -148,7 +136,14 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-blue-500 text-white font-bold">Submit</Button>
+            <Button
+
+              type="submit"
+              className="w-full bg-blue-500 text-white font-bold"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? 'Creating account...' : 'Register'}
+            </Button>
           </form>
         </Form>
 
