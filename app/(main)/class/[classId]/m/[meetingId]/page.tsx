@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from '@/components/ui/breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -78,16 +78,16 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink >
-                  Python Meeting
+                <BreadcrumbLink href="/class">
+                  List of Classes
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              {/* <BreadcrumbSeparator className="hidden md:block" /> */}
-              {/* <BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
                 <BreadcrumbPage>
-                  Class Detail
+                  {meetingData?.data.name}
                 </BreadcrumbPage>
-              </BreadcrumbItem> */}
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>

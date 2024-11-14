@@ -46,7 +46,7 @@ function ClassDetailPage({ params }: ClassDetailPageProps) {
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  Class Detail
+                  {classDetail?.data.name}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

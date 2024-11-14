@@ -18,7 +18,16 @@ export interface ClassData {
   userId: string
   user: User
   meetings: Meeting[]
+  members: Member[]
+
 }
+export interface Member {
+  role: string
+  userId: string
+  joinAt: string
+  user: User
+}
+
 
 export interface User {
   fullname: string

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, MoreVertical } from "lucide-react";
+import { ExternalLink, MoreVertical, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { useGetProfile } from '@/hooks/api/user-service-hooks';
 import { useModalStore } from '@/hooks/use-modal-store';
 import { ClassData } from '@/hooks/api/class-service-hooks';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const ClassCard = ({ classData }: {
   classData: ClassData;
@@ -30,7 +31,7 @@ const ClassCard = ({ classData }: {
 
   const isOwner = profileData?.data.id === classData.userId;
 
-  // console.log('isOwner', isOwner);
+  console.log('classData', classData);
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-sm hover:shadow-md transition-shadow
@@ -94,14 +95,57 @@ const ClassCard = ({ classData }: {
           Created {formattedDate}
         </div>
         <div className="flex gap-2">
-          {/* <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-900"
-          >
-            <Users className="h-4 w-4 mr-1" />
-            Students
-          </Button> */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <Users className="h-4 w-4 mr-1" />
+                {classData.members?.length || 0}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[200px] p-2">
+              {classData.members?.length === 0 ? (
+                <div className="text-sm text-gray-500 p-2">No students yet</div>
+              ) : (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
+                  {/* Teachers Section */}
+                  <div className="text-xs font-semibold text-gray-500 px-2">Teachers</div>
+                  {classData.members
+                    ?.filter(member => member.role === "TEACHER")
+                    .map((member) => (
+                      <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={member.user.avatar} />
+                          <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="truncate text-sm flex-1">{member.user.fullname}</span>
+                        {/* <Badge variant="secondary" className="text-xs">Teacher</Badge> */}
+                      </div>
+                    ))}
+
+                  <div className="h-px bg-gray-200 my-2" />
+
+                  {/* Students Section */}
+                  <div className="text-xs font-semibold text-gray-500 px-2">Students</div>
+                  {classData.members
+                    ?.filter(member => member.role === "STUDENT")
+                    .map((member) => (
+                      <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={member.user.avatar} />
+                          <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="truncate text-sm flex-1">{member.user.fullname}</span>
+                        {/* <Badge variant="outline" className="text-xs">Student</Badge> */}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
 
           <Link href={`/class/${classData.id}`}>
             <Button
