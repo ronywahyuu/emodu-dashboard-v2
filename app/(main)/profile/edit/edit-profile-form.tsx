@@ -59,7 +59,6 @@ export function EditProfileForm() {
 
 
   function onSubmit(data: ProfileFormValues) {
-    console.log('data', data)
     // console.log(data)
     // toast('Profile updated')
     updateProfile.mutate({

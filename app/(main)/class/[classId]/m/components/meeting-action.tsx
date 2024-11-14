@@ -89,11 +89,10 @@ export default function MeetingActions({
   // const isRecognitionSwitchedOn =
   //   localStorage.getItem("startRecognition") === "true" ? true : false;
   // const isRecognitionSwitchedOn = meetingData?.data.isRecognitionStarted
-  const selectedRecognitionModel = meetingData?.data.selectedRecognitionModel;
+  // const selectedRecognitionModel = meetingData?.data.selectedRecognitionModel;
   const selectRecognitionModel = useSelectRecognitionModel();
 
 
-  console.log('selectedModel', selectedRecognitionModel)
 
   // const [isStartRecognition, setIsStartRecognition] = useState(
   //   isRecognitionSwitchedOn
@@ -141,7 +140,6 @@ export default function MeetingActions({
   };
 
 
-  console.log('recognitionsData', recognitionsData.data.recognitionsSummary)
 
   const recognitionPieComponent = <DoughnutChart data={recognitionsData.data.recognitionsSummary} width={pipWindowWidth} height={pipWindowHeight} />;
   // const recognitionComponent = <RadarChart data={recognitionsData.data.recognitionsOverview} />;

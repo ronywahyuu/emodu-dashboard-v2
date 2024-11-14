@@ -1,10 +1,10 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
+  // BadgeCheck,
+  // Bell,
   ChevronsUpDown,
-  CreditCard,
+  // CreditCard,
   LogOut,
   User2Icon,
 } from "lucide-react"
@@ -97,7 +97,7 @@ export function NavUser( ) {
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
@@ -110,8 +110,8 @@ export function NavUser( ) {
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            </DropdownMenuGroup> */}
+            {/* <DropdownMenuSeparator /> */}
             <DropdownMenuItem
               onClick={() => {
                 fetch("/api/logout", {

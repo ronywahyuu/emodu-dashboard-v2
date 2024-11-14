@@ -31,7 +31,6 @@ const ClassCard = ({ classData }: {
 
   const isOwner = profileData?.data.id === classData.userId;
 
-  console.log('classData', classData);
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-sm hover:shadow-md transition-shadow
@@ -102,6 +101,7 @@ const ClassCard = ({ classData }: {
                 size="sm"
                 className="text-gray-600 hover:text-gray-900"
               >
+                Members
                 <Users className="h-4 w-4 mr-1" />
                 {classData.members?.length || 0}
               </Button>
@@ -114,7 +114,7 @@ const ClassCard = ({ classData }: {
                   {/* Teachers Section */}
                   <div className="text-xs font-semibold text-gray-500 px-2">Teachers</div>
                   {classData.members
-                    ?.filter(member => member.role === "TEACHER")
+                    ?.filter(member => member.role === "TEACHER" && member.userId === classData.userId)
                     .map((member) => (
                       <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
                         <Avatar className="h-6 w-6">
@@ -122,11 +122,31 @@ const ClassCard = ({ classData }: {
                           <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <span className="truncate text-sm flex-1">{member.user.fullname}</span>
-                        {/* <Badge variant="secondary" className="text-xs">Teacher</Badge> */}
+                        <Badge variant="secondary" className="text-xs">Owner</Badge>
                       </div>
                     ))}
 
                   <div className="h-px bg-gray-200 my-2" />
+
+                  {/* Co Teachers Section */}
+                  {classData.members?.some(member => member.role === "TEACHER" && member.userId !== classData.userId) && (
+                    <>
+                      <div className="text-xs font-semibold text-gray-500 px-2">Co-Teachers</div>
+                      {classData.members
+                        ?.filter(member => member.role === "TEACHER" && member.userId !== classData.userId)
+                        .map((member) => (
+                          <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={member.user.avatar} />
+                              <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <span className="truncate text-sm flex-1">{member.user.fullname}</span>
+                            <Badge variant="secondary" className="text-xs">Co-Teacher</Badge>
+                          </div>
+                        ))}
+                      <div className="h-px bg-gray-200 my-2" />
+                    </>
+                  )}
 
                   {/* Students Section */}
                   <div className="text-xs font-semibold text-gray-500 px-2">Students</div>

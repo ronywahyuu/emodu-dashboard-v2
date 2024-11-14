@@ -22,11 +22,13 @@ import Participants from '../components/participants'
 import { useGetProfile } from '@/hooks/api/user-service-hooks'
 import NotAuthorizedPageComponent from '../components/not-authorized'
 import { BaseResponse } from '@/constants/types'
+import { useGetClassById } from '@/hooks/api/class-service-hooks'
 // import EmovalaroRecognition from '../components/emovalaro-recognition'
 
 interface MeetingDetailPageProps {
   params: {
     meetingId: string
+    classId: string
   }
 }
 
@@ -36,6 +38,12 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   //   data: meetingDetail,
   //   isLoading
   // } = useGetMeetingById(params.meetingId)
+  const {
+    data: classData,
+    isPending: classDataPending
+
+  } = useGetClassById(params.classId)
+
   const {
     data: meetingData,
     isPending: meetingDataPending
@@ -49,6 +57,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   } = useGetRecognitionByMeetingCode(params.meetingId)
 
   const isOwner = meetingData?.data.createdBy === profile?.data.id
+  const isCoTeacher = classData?.data.members.some((member: any) => member.userId === profile?.data.id && member.role === 'TEACHER')
 
   // console.log('isOwner', isOwner)
   const handleStartMeeting = () => {
@@ -56,17 +65,16 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
 
   }
 
-  if (meetingDataPending || recognitionsDataPending) {
+  if (meetingDataPending || recognitionsDataPending || classDataPending) {
     return <Skeleton className="w-full h-screen" />
   }
 
-  if (!isOwner) {
+  if (!isOwner && !isCoTeacher) {
     return (
       <NotAuthorizedPageComponent />
     )
   }
 
-  // console.log('meetingData', meetingData)
 
 
   return (
