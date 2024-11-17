@@ -12,11 +12,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Separator } from '@/components/ui/separator'
-import { useGetClassById } from '@/hooks/api/class-service-hooks'
+import { Meeting, useGetClassById } from '@/hooks/api/class-service-hooks'
 import MeetingCard from '../components/meeting-card'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import { useModalStore } from '@/hooks/use-modal-store'
+import { RecentMeetings } from '@/hooks/api/dashboard-service-hooks'
 
 interface ClassDetailPageProps {
   params: {
@@ -72,7 +73,7 @@ function ClassDetailPage({ params }: ClassDetailPageProps) {
 
         <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
           {classDetail?.data.meetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} />
+            <MeetingCard key={meeting.id} meeting={meeting as (Meeting & RecentMeetings)} />
           ))}
         </div>
       </div>
