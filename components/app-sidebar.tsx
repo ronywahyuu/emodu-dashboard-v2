@@ -4,9 +4,12 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
+  ChartArea,
   // Frame,
+  // LayoutDashboard,
   Map,
-  PieChart,
+  // PieChart,
+  School,
   Settings2,
   SquareTerminal,
 } from "lucide-react"
@@ -25,6 +28,7 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link"
+// import { NavMain } from "./nav-main"
 const data = {
   user: {
     name: "shadcn",
@@ -131,20 +135,43 @@ const data = {
     // },
   ],
   projects: [
-    // {
-    //   name: "Dashboard",
-    //   url: "/dashboard",
-    //   icon: Frame,
-    // },
     {
-      name: "Class",
-      url: "/class",
-      icon: PieChart,
+      title: "Dashboard",
+      name: "Dashboard",
+      url: "/dashboard",
+      // icon: Frame,
+      icon: ChartArea
     },
     {
+      title: "Class",
+      name: "Class",
+      url: "/class",
+      icon: School,
+      items: [
+        {
+          title: "Introduction",
+          url: "#",
+        },
+        {
+          title: "Get Started",
+          url: "#",
+        },
+        {
+          title: "Tutorials",
+          url: "#",
+        },
+        {
+          title: "Changelog",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Emodu Extension",
       name: "Emodu Extension",
       url: "/get-extension",
       icon: Map,
+      updated: true,
     },
   ],
 }
@@ -192,6 +219,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* <NavMain items={data.navMain} /> */}
         <NavProjects projects={data.projects} />
+        {/* <NavMain items={data.projects} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

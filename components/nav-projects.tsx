@@ -22,6 +22,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { Badge } from "./ui/badge"
 
 export function NavProjects({
   projects,
@@ -30,6 +31,7 @@ export function NavProjects({
     name: string
     url: string
     icon: LucideIcon
+    updated?: boolean
   }[]
 }) {
   const { isMobile } = useSidebar()
@@ -46,8 +48,14 @@ export function NavProjects({
                 <span>{item.name}</span>
               </a> */}
               <Link href={item.url}>
-                  <item.icon />
-                  <span>{item.name}</span>
+                <item.icon />
+                <span>{item.name}</span>
+                {item.updated && (
+                  <Badge className="bg-green-600 text-white animate-pulse">
+                    New
+                  </Badge>
+                )}
+
                 {/* <a>
                 </a> */}
               </Link>
