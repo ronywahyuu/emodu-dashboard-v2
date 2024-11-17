@@ -23,7 +23,8 @@ import { useGetProfile } from '@/hooks/api/user-service-hooks'
 import NotAuthorizedPageComponent from '../components/not-authorized'
 import { BaseResponse } from '@/constants/types'
 import { useGetClassById } from '@/hooks/api/class-service-hooks'
-// import EmovalaroRecognition from '../components/emovalaro-recognition'
+import EmovalaroRecognition from '../components/emovalaro-recognition'
+// import { useGetValenceArousalDataByUser } from '@/hooks/api/valence-arousal-service-hooks'
 
 interface MeetingDetailPageProps {
   params: {
@@ -56,10 +57,11 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
     error: recognitionsDataError
   } = useGetRecognitionByMeetingCode(params.meetingId)
 
+  // const {} = useGetValenceArousalDataByUser()
+
   const isOwner = meetingData?.data.createdBy === profile?.data.id
   const isCoTeacher = classData?.data.members.some((member: any) => member.userId === profile?.data.id && member.role === 'TEACHER')
 
-  // console.log('isOwner', isOwner)
   const handleStartMeeting = () => {
     toggleStartMeeting.mutate(params.meetingId)
 
@@ -75,6 +77,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
     )
   }
 
+  console.log('meetingData', meetingData)
 
 
   return (
@@ -212,43 +215,36 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
       </div>
 
       <div className="mt-10 mx-10">
-        <Tabs defaultValue="recognition" className="w-full">
-          <TabsList>
-            <TabsTrigger value="recognition">Recognition (Face-api.js)</TabsTrigger>
-            {/* <TabsTrigger value="recognition-rangga">Recognition (EmoValaro7)</TabsTrigger> */}
-            {/* <TabsTrigger value="valencearousal">Valence Arousal Data</TabsTrigger> */}
-            <TabsTrigger value="participants">Participants</TabsTrigger>
-          </TabsList>
-          <TabsContent value="recognition">
-            {recognitionsDataPending ? (
-              // <Skeleton className="w-full h-screen" />
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-              </div>
-            ) : (
-              // <div>w</div>
-              <Recognitions
-                recognitionDetail={
-                  recognitionsData?.data.recognitionsDetail as RecognitionsDetail
-                }
-                recognitionOverview={
-                  recognitionsData?.data.recognitionsOverview as RecognitionsOverview
-                }
-                recognitionSummary={
-                  recognitionsData?.data.recognitionsSummary as RecognitionsSummary
-                }
-              />
-            )}
-          </TabsContent>
-          {/* <TabsContent value="recognition-rangga">
-            {recognitionsDataPending ? (
-              <Skeleton className="w-full h-screen" />
-            ) : (
-              <EmovalaroRecognition />
-            )}
-          </TabsContent> */}
-          <TabsContent value="participants">
-            {/* {!recognitionsDataPending ? (
+        {meetingData?.data.selectedRecognitionModel === 'FACE_API' && (
+          <Tabs defaultValue="recognition" className="w-full">
+            <TabsList>
+              <TabsTrigger value="recognition">Recognition (Face-api.js)</TabsTrigger>
+              {/* <TabsTrigger value="valencearousal">Valence Arousal Data</TabsTrigger> */}
+              <TabsTrigger value="participants">Participants</TabsTrigger>
+            </TabsList>
+            <TabsContent value="recognition">
+              {recognitionsDataPending ? (
+                // <Skeleton className="w-full h-screen" />
+                <div className="flex justify-center items-center h-64">
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                // <div>w</div>
+                <Recognitions
+                  recognitionDetail={
+                    recognitionsData?.data.recognitionsDetail as RecognitionsDetail
+                  }
+                  recognitionOverview={
+                    recognitionsData?.data.recognitionsOverview as RecognitionsOverview
+                  }
+                  recognitionSummary={
+                    recognitionsData?.data.recognitionsSummary as RecognitionsSummary
+                  }
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="participants">
+              {/* {!recognitionsDataPending ? (
               <div className="flex flex-col items-center  min-h-[60vh] justify-center space-y-3">
                 <Image
                   src="/images/no_participant_1.svg"
@@ -260,15 +256,55 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
               </div>
             ) : (
             )} */}
-            <Participants
-              meetingData={meetingData as any}
-              recognitionDetail={
-                recognitionsData?.data.recognitionsDetail as RecognitionsDetail
-              }
-              participants={meetingData?.data.participants as any}
-            />
-          </TabsContent>
-        </Tabs>
+              <Participants
+                meetingData={meetingData as any}
+                recognitionDetail={
+                  recognitionsData?.data.recognitionsDetail as RecognitionsDetail
+                }
+                participants={meetingData?.data.participants as any}
+              />
+            </TabsContent>
+          </Tabs>
+        )}
+
+        {meetingData?.data.selectedRecognitionModel === 'EMOVALARO' &&
+          (
+            <Tabs defaultValue="recognition-rangga" className="w-full">
+              <TabsList>
+                <TabsTrigger value="recognition-rangga">Recognition (EmoValaro7)</TabsTrigger>
+                {/* <TabsTrigger value="valencearousal">Valence Arousal Data</TabsTrigger> */}
+                <TabsTrigger value="participants">Participants</TabsTrigger>
+              </TabsList>
+              <TabsContent value="recognition-rangga" >
+                {recognitionsDataPending ? (
+                  <Skeleton className="w-full h-screen" />
+                ) : (
+                  <EmovalaroRecognition meetingCode={params.meetingId} />
+                )}
+              </TabsContent>
+              <TabsContent value="participants">
+                {/* {!recognitionsDataPending ? (
+              <div className="flex flex-col items-center  min-h-[60vh] justify-center space-y-3">
+                <Image
+                  src="/images/no_participant_1.svg"
+                  width={300}
+                  height={300}
+                  alt="No participants"
+                />
+                <p className="text-4xl text-gray-400">No participants</p>
+              </div>
+            ) : (
+            )} */}
+                <Participants
+                  meetingData={meetingData as any}
+                  recognitionDetail={
+                    recognitionsData?.data.recognitionsDetail as RecognitionsDetail
+                  }
+                  participants={meetingData?.data.participants as any}
+                />
+              </TabsContent>
+            </Tabs>
+          )}
       </div>
 
 

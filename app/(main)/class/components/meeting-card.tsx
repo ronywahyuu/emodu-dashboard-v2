@@ -8,9 +8,10 @@ import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useModalStore } from '@/hooks/use-modal-store';
 import { useGetProfile } from '@/hooks/api/user-service-hooks';
+import { RecentMeetings } from '@/hooks/api/dashboard-service-hooks';
 
 interface MeetingCardProps {
-  meeting: Meeting;
+  meeting: Meeting & RecentMeetings;
 }
 
 const MeetingCard: React.FC<MeetingCardProps> = ({ meeting }) => {
@@ -22,7 +23,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ meeting }) => {
   // console.log('isOwner', isOwner);
 
   return (
-    <Card className="w-full max-w-md bg-white shadow-lg hover:shadow-xl transition-shadow duration-300
+    <Card className="w-full  bg-white shadow-lg hover:shadow-xl transition-shadow duration-300
             dark:bg-transparent dark:shadow-none dark:hover:shadow-none dark:text-white dark:border dark:border-gray-700
 
     ">

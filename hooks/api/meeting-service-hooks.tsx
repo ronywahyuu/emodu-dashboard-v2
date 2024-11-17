@@ -12,7 +12,7 @@ export interface MeetingData {
   isEnded: boolean
   isRecognitionStarted: boolean
   isRecognitionEnded: boolean
-  selectedRecognitionModel: string
+  selectedRecognitionModel: 'EMOVALARO' | 'FACE_API'
   startedAt: string
   createdAt: string
   updatedAt: string

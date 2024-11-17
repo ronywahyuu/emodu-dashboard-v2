@@ -1,7 +1,8 @@
-import React from 'react';
+'use client'
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, MoreVertical, Users } from "lucide-react";
+import { Check, Copy, ExternalLink, MoreVertical, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +31,19 @@ const ClassCard = ({ classData }: {
   } = useGetProfile();
 
   const isOwner = profileData?.data.id === classData.userId;
+  const [copied, setCopied] = useState(false);
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(classData.classCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  // console.log('meeting', classData);
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-sm hover:shadow-md transition-shadow
@@ -68,9 +81,31 @@ const ClassCard = ({ classData }: {
         <div className="flex flex-col gap-2 text-sm text-gray-600">
           <span className="font-sm">Class Code:</span>
           <code className="bg-gray-100 px-2 py-0.5 rounded *:
-            dark:bg-gray-700 dark:text-gray-100 dark:bg-opacity-50 dark:rounded-lg truncate
+            dark:bg-gray-700 dark:text-gray-100 dark:bg-opacity-50 dark:rounded-lg truncate flex items-center justify-between
           ">
             {classData.classCode}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={handleCopy}
+              title={copied ? "Copied!" : "Copy class code"}
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4 text-gray-500" />
+              )}
+            </Button>
+          </code>
+        </div>
+        <div className="flex flex-col gap-2 text-sm text-gray-600 mt-3">
+          <span className="font-sm">Number of Meetings:</span>
+          <code className="bg-gray-100 px-2 py-0.5 rounded *:
+            dark:bg-gray-700 dark:text-gray-100 dark:bg-opacity-50 dark:rounded-lg truncate
+          ">
+            {/* {classData.classCode} */}
+            {classData.meetings.length}
           </code>
         </div>
         <div className="flex  items-center gap-2 text-sm text-gray-600 mt-5">
@@ -97,9 +132,9 @@ const ClassCard = ({ classData }: {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="text-gray-600 hover:text-gray-900"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 Members
                 <Users className="h-4 w-4 mr-1" />

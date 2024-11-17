@@ -1,123 +1,196 @@
-"use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useState, useEffect } from "react"
-import { Bar, Line, XAxis, YAxis, CartesianGrid, Legend, ComposedChart, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+'use client'
+import React from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  RadarChart,
+  // RadarLine,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  LineChart,
+  Line,
+  Cell,
+} from 'recharts';
+import { useGetValenceArousalAnalytics } from '@/hooks/api/valence-arousal-service-hooks';
+import { Skeleton } from '@/components/ui/skeleton';
 
-type FaceBox = {
-  height: number
-  width: number
-  x: number
-  y: number
-}
 
-type EmotionData = {
-  arousal: number
-  emotion: string
-  emotion_perc: number
-  face_box: FaceBox
-  valence: number
-  userId: string
-  timeStamp: string
-}
+const EmotionAnalyticsDashboard = ({ meetingCode }: {
+  meetingCode: string
+}) => {
+  console.log('meetingCode', meetingCode);
 
-// Function to generate timestamp
-const generateTimestamp = () => new Date().toISOString()
+  const { data: valaroAnalytics, isPending } = useGetValenceArousalAnalytics(meetingCode);
 
-// Function to simulate data generation
-const generateData = (count: number): EmotionData[] => {
-  const emotions = ["Neutral", "Happiness", "Sadness", "Anger", "Surprise"]
-  return Array.from({ length: count }, () => ({
-    arousal: Math.random() * 2 - 1,
-    emotion: emotions[Math.floor(Math.random() * emotions.length)],
-    emotion_perc: Math.random(),
-    face_box: {
-      height: Math.floor(Math.random() * 100) + 250,
-      width: Math.floor(Math.random() * 100) + 250,
-      x: Math.floor(Math.random() * 500),
-      y: Math.floor(Math.random() * 500)
-    },
-    valence: Math.random() * 2 - 1,
-    userId: "user" + Math.floor(Math.random() * 1000),
-    timeStamp: generateTimestamp()
-  }))
-}
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-export default function EmotionChart() {
-  const [data, setData] = useState<EmotionData[]>([])
-
-  useEffect(() => {
-    // Initialize with some data
-    setData(generateData(5))
-
-    // Simulating data updates every 5 seconds
-    const interval = setInterval(() => {
-      setData((prevData) => {
-        const newData = [...prevData, ...generateData(1)].slice(-10)
-        return newData
-      })
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [])
+  if (isPending) {
+    return <Skeleton />
+  }
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border rounded-lg shadow-lg">
+          <p className="font-bold">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-sm">
+              {entry.name}: {entry.value.toFixed(2)}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
-    <Card className="w-full my-3">
-      <CardHeader>
-        <CardTitle>Emotion Data Visualization</CardTitle>
-        <CardDescription>Real-time emotion, arousal, and valence data</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={{
-            arousal: {
-              label: "Arousal",
-              color: "hsl(var(--chart-1))",
-            },
-            emotion_perc: {
-              label: "Emotion %",
-              color: "hsl(var(--chart-3))",
-            },
-            valence: {
-              label: "Valence",
-              color: "hsl(var(--chart-2))",
-            },
-            emotion: {
-              label: "Emotion",
-              color: "hsl(var(--chart-4))",
-            },
-          }}
-          className="h-[400px] mx-auto"
-        >
+    <div className="w-full space-y-6 p-8">
+      {/* Header Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Records</CardTitle>
+            <CardDescription>Number of emotional responses recorded</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* <p className="text-3xl font-bold">{data.totalRecords}</p> */}
+            <p className="text-3xl font-bold">{valaroAnalytics?.data.totalRecords}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Unique Participants</CardTitle>
+            <CardDescription>Number of different participants</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* <p className="text-3xl font-bold">{data.uniqueParticipants}</p> */}
+            <p className="text-3xl font-bold">{valaroAnalytics?.data.uniqueParticipants}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Emotion Distribution Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Emotion Distribution</CardTitle>
+          <CardDescription>Percentage distribution of emotions</CardDescription>
+        </CardHeader>
+        <CardContent className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data}>
+            {/* <BarChart data={data.emotions}> */}
+            <BarChart data={valaroAnalytics?.data.emotions}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timeStamp" tickFormatter={(value) => new Date(value).toLocaleTimeString()} />
-              <YAxis yAxisId="left" domain={[-1, 1]} />
-              <YAxis yAxisId="right" orientation="right" domain={[0, 1]} />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <XAxis dataKey="emotion" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="arousal" stroke="var(--color-arousal)" />
-              <Line yAxisId="left" type="monotone" dataKey="valence" stroke="var(--color-valence)" />
-              <Bar yAxisId="right" dataKey="emotion_perc" fill="var(--color-emotion_perc)" />
-            </ComposedChart>
+              <Bar dataKey="percentage" name="Percentage">
+                {/* {data.emotions.map((entry, index) => ( */}
+                {valaroAnalytics?.data.emotions.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]} // Using same COLORS array as pie chart
+                  />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
-        </ChartContainer>
-        <div className="mt-4 space-y-2  mx-auto flex flex-col justify-center items-center">
-          <p className="text-lg font-semibold">Latest Emotion Data:</p>
-          {data.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <p><strong>Emotion:</strong> {data[data.length - 1].emotion}</p>
-              <p><strong>User ID:</strong> {data[data.length - 1].userId}</p>
-              <p><strong>Arousal:</strong> {data[data.length - 1].arousal.toFixed(2)}</p>
-              <p><strong>Valence:</strong> {data[data.length - 1].valence.toFixed(2)}</p>
-              <p><strong>Emotion %:</strong> {(data[data.length - 1].emotion_perc * 100).toFixed(2)}%</p>
-              <p><strong>Timestamp:</strong> {new Date(data[data.length - 1].timeStamp).toLocaleString()}</p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+        </CardContent>
+      </Card>
+
+      {/* Valence and Arousal Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Valence and Arousal</CardTitle>
+          <CardDescription>Emotional dimensions by category</CardDescription>
+        </CardHeader>
+        <CardContent className="h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            {/* <LineChart data={data.emotions}> */}
+            <LineChart data={valaroAnalytics?.data.emotions}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="emotion" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="valence"
+                stroke="#8884d8"
+                name="Valence"
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="arousal"
+                stroke="#82ca9d"
+                name="Arousal"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Radar Chart for Emotional Dimensions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Emotional Dimensions Radar</CardTitle>
+          <CardDescription>Combined view of all emotional metrics</CardDescription>
+        </CardHeader>
+        <CardContent className="h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            {/* <RadarChart outerRadius="80%" data={data.emotions}> */}
+            <RadarChart outerRadius="80%" data={valaroAnalytics?.data.emotions}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="emotion" />
+              <PolarRadiusAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Radar
+                name="Percentage"
+                dataKey="percentage"
+                stroke="#8884d8"
+                fill="#8884d8"
+                fillOpacity={0.6}
+              />
+              {/* <Radar
+                name="Emotion Percentage"
+                dataKey="emotionPercentage"
+                stroke="#82ca9d"
+                fill="#82ca9d"
+                fillOpacity={0.6}
+              /> */}
+              <Radar
+                name="Arousal"
+                dataKey="arousal"
+                stroke="#ffc658"
+                fill="#ffc658"
+                fillOpacity={0.6}
+              />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default EmotionAnalyticsDashboard;
