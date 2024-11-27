@@ -15,6 +15,7 @@ export type ModalType =
   | "deleteMeetingDialog"
   | "deleteClassDialog"
   | "feedbackDialog"
+  | "confirmDialog"
 
 type ModalData = {
   classId?: string;
@@ -49,8 +50,14 @@ type FeedbackModalData = {
   email?: string;
 }
 
+type ConfirmModalData = {
+  title?: string;
+  body?: string;
+  onConfirm?: () => void;
+}
+
 export interface ModalStore {
-  data: ModalData & MeetingModalData & ClassModalData & FeedbackModalData;
+  data: ModalData & MeetingModalData & ClassModalData & FeedbackModalData & ConfirmModalData;
   isOpen: boolean;
   modalType: ModalType ;
   onClose: () => void;

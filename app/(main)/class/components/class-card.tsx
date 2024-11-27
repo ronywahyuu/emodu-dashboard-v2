@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, ExternalLink, MoreVertical, Users } from "lucide-react";
+import { Check, Copy, EllipsisVertical, ExternalLink, MoreVertical, UserPlus, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +14,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useGetProfile } from '@/hooks/api/user-service-hooks';
 import { useModalStore } from '@/hooks/use-modal-store';
-import { ClassData } from '@/hooks/api/class-service-hooks';
+import { ClassData, useAddCoTeacher, useRemoveCoTeacher } from '@/hooks/api/class-service-hooks';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import ActionTooltip from '@/components/action-tooltip';
+import { toast } from 'sonner';
 
 const ClassCard = ({ classData }: {
   classData: ClassData;
 }) => {
-  const { onOpen } = useModalStore();
+  const { onOpen, onClose } = useModalStore();
   const formattedDate = new Date(classData.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -29,6 +31,9 @@ const ClassCard = ({ classData }: {
   const {
     data: profileData,
   } = useGetProfile();
+
+  const addCoTeacher = useAddCoTeacher();
+  const removeCoTeacher = useRemoveCoTeacher();
 
   const isOwner = profileData?.data.id === classData.userId;
   const [copied, setCopied] = useState(false);
@@ -44,6 +49,7 @@ const ClassCard = ({ classData }: {
   };
 
   // console.log('meeting', classData);
+  const isLoadingCoTeachers = false;
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-sm hover:shadow-md transition-shadow
@@ -141,7 +147,7 @@ const ClassCard = ({ classData }: {
                 {classData.members?.length || 0}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-[200px] p-2">
+            <PopoverContent align="end" className="w-[400px]  p-2">
               {classData.members?.length === 0 ? (
                 <div className="text-sm text-gray-500 p-2">No students yet</div>
               ) : (
@@ -151,14 +157,17 @@ const ClassCard = ({ classData }: {
                   {classData.members
                     ?.filter(member => member.role === "TEACHER" && member.userId === classData.userId)
                     .map((member) => (
-                      <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={member.user.avatar} />
-                          <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className="truncate text-sm flex-1">{member.user.fullname}</span>
-                        <Badge variant="secondary" className="text-xs">Owner</Badge>
-                      </div>
+                      <ActionTooltip key={member.userId} label={member.user.fullname}>
+
+                        <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-default">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={member.user.avatar} />
+                            <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="truncate text-sm flex-1">{member.user.fullname}</span>
+                          <Badge variant="secondary" className="text-xs">Owner</Badge>
+                        </div>
+                      </ActionTooltip>
                     ))}
 
                   <div className="h-px bg-gray-200 my-2" />
@@ -170,14 +179,69 @@ const ClassCard = ({ classData }: {
                       {classData.members
                         ?.filter(member => member.role === "TEACHER" && member.userId !== classData.userId)
                         .map((member) => (
-                          <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={member.user.avatar} />
-                              <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <span className="truncate text-sm flex-1">{member.user.fullname}</span>
-                            <Badge variant="secondary" className="text-xs">Co-Teacher</Badge>
-                          </div>
+                          <ActionTooltip key={member.userId} label={member.user.fullname}>
+
+                            <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-default">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={member.user.avatar} />
+                                <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <span className="truncate text-sm flex-1">{member.user.fullname}</span>
+                              {/* <Badge variant="secondary" className="text-xs">Co-Teacher</Badge> */}
+                              {isOwner && (
+
+                                <div>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs"
+                                      >
+                                        <EllipsisVertical />
+                                      </Button>
+
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem
+                                        onClick={() => {
+                                          if (isLoadingCoTeachers) return;
+
+                                          onOpen('confirmDialog', {
+                                            title: `Remove ${member.user.fullname} as Co-Teacher`,
+                                            message: `Are you sure you want to remove ${member.user.fullname} as a co-teacher?`,
+                                            onConfirm: () => {
+                                              // Add member as co-teacher
+                                              removeCoTeacher.mutate({ classId: classData.id, userId: member.userId }, {
+                                                onSuccess: () => {
+                                                  toast.success(`${member.user.fullname} removed as co-teacher`);
+                                                  onClose();
+                                                },
+                                                onError: () => {
+                                                  toast.error(`Failed to remove ${member.user.fullname} as co-teacher`);
+                                                  onClose();
+                                                }
+                                              })
+                                              // console.log('Add member as co-teacher', classData.id, member.userId);
+                                            }
+                                          });
+                                        }}
+                                      >
+                                        {isLoadingCoTeachers ? (
+                                          <span className="text-gray-400">Assigning...</span>
+                                        ) : (
+                                          <>
+                                            <UserPlus className="h-4 w-4 mr-1" />
+                                            Remove as Co-Teacher
+                                          </>
+                                        )}
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              )}
+                            </div>
+                          </ActionTooltip>
                         ))}
                       <div className="h-px bg-gray-200 my-2" />
                     </>
@@ -188,13 +252,67 @@ const ClassCard = ({ classData }: {
                   {classData.members
                     ?.filter(member => member.role === "STUDENT")
                     .map((member) => (
-                      <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={member.user.avatar} />
-                          <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
-                        </Avatar>
+
+                      <div key={member.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-default">
+                        <ActionTooltip label={member.user.fullname}>
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={member.user.avatar} />
+                            <AvatarFallback>{member.user.fullname.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                        </ActionTooltip>
                         <span className="truncate text-sm flex-1">{member.user.fullname}</span>
-                        {/* <Badge variant="outline" className="text-xs">Student</Badge> */}
+
+                        {isOwner && (
+
+                          <div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  <EllipsisVertical />
+                                </Button>
+
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    if (isLoadingCoTeachers) return;
+
+                                    onOpen('confirmDialog', {
+                                      title: `Add ${member.user.fullname} as Co-Teacher`,
+                                      message: `Are you sure you want to add ${member.user.fullname} as a co-teacher?`,
+                                      onConfirm: () => {
+                                        // Add member as co-teacher
+                                        addCoTeacher.mutate({ classId: classData.id, userId: member.userId }, {
+                                          onSuccess: () => {
+                                            toast.success(`${member.user.fullname} added as co-teacher`);
+                                            onClose();
+                                          },
+                                          onError: () => {
+                                            toast.error(`Failed to add ${member.user.fullname} as co-teacher`);
+                                            onClose();
+                                          }
+                                        })
+                                      }
+                                    });
+                                  }}
+                                >
+                                  {isLoadingCoTeachers ? (
+                                    <span className="text-gray-400">Assigning...</span>
+                                  ) : (
+                                    <>
+                                      <UserPlus className="h-4 w-4 mr-1" />
+                                      Add as Co-Teacher
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        )}
                       </div>
                     ))}
                 </div>
@@ -206,7 +324,6 @@ const ClassCard = ({ classData }: {
             <Button
               variant="default"
               size="sm"
-              className="dark:text-gray-600 hover:text-gray-900"
             >
               <ExternalLink className="h-4 w-4 mr-1" />
               View

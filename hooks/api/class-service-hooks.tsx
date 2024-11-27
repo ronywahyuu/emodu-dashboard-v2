@@ -63,7 +63,7 @@ export interface EditClassDto {
 }
 
 type ClassResponse = BaseListResponse<ClassData>;
-type ClassDetailResponse =BaseResponse<ClassData>;
+type ClassDetailResponse = BaseResponse<ClassData>;
 
 
 export const useGetClass = () => {
@@ -129,6 +129,36 @@ export const useDeleteClass = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       return apiClient.delete(`${BASE_URL}/class/${id}`)
+        .then((res) => res.data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+}
+
+export const useAddCoTeacher = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { classId: string, userId: string }) => {
+      return apiClient.patch(`${BASE_URL}/class/add-coteacher/${data.classId}`, {
+        userId: data.userId
+      })
+        .then((res) => res.data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+}
+
+export const useRemoveCoTeacher = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { classId: string, userId: string }) => {
+      return apiClient.patch(`${BASE_URL}/class/remove-coteacher/${data.classId}`, {
+        userId: data.userId
+      })
         .then((res) => res.data);
     },
     onSuccess: () => {
