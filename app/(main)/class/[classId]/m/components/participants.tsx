@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  FilterFn,
   SortingState,
   VisibilityState,
   flexRender,
@@ -34,10 +35,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  ChartBarIcon,
   ChevronDownIcon,
   Download,
   MoreHorizontal,
   SortAscIcon,
+  UserCog,
 } from "lucide-react";
 import Link from "next/link";
 // import { MeetingsType, ParticipantType } from "@/lib/api/types";
@@ -62,6 +65,31 @@ export interface UserParticipant {
   };
 }
 
+const fuzzyFilter: FilterFn<UserParticipant> = (row, columnId, filterValue: string) => {
+  console.log('row', row);
+  const searchValue = filterValue.toLowerCase();
+
+  // Search in user object
+  if (row.original.user) {
+    if (
+      row.original.user.fullname.toLowerCase().includes(searchValue) ||
+      row.original.user.email.toLowerCase().includes(searchValue)
+    ) {
+      return true;
+    }
+  }
+
+  // Search in join date
+  if (row.original.joinAt) {
+    if (new Date(row.original.joinAt).toLocaleString().toLowerCase().includes(searchValue)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+
 export const columnsData: ColumnDef<UserParticipant>[] = [
   {
     id: "select",
@@ -82,7 +110,7 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
         aria-label="Select row"
       />
     ),
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -102,6 +130,8 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
     cell: ({ row }) => (
       <div className="capitalize">{row.original.user.fullname}</div>
     ),
+    enableColumnFilter: true,
+    enableSorting: true,
   },
   {
     accessorKey: "email",
@@ -117,6 +147,8 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
       );
     },
     cell: ({ row }) => <div className="lowercase">{row.original.user.email}</div>,
+    enableColumnFilter: true,
+    enableSorting: true,
   },
   {
     accessorKey: "joinAt",
@@ -135,26 +167,6 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
       new Date(row.original.joinAt).toLocaleString()
     }</div>,
   },
-  // {
-  //   accessorKey: "joinAt",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Connection
-  //         <SortAscIcon className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => <div >{row.original.leftAt ? 'Left' : <span>
-  //     🟢 Online
-  //   </span> }</div>,
-  //   // cell: ({ row }) => <div className="lowercase">{
-  //   //   new Date(row.original.joinAt).toLocaleString()
-  //   // }</div>,
-  // },
 ];
 
 export default function Participants({
@@ -167,8 +179,12 @@ export default function Participants({
 }) {
   const data = participants;
   const { onOpen } = useModalStore();
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
 
   // console.log(participants);
+
+  console.log('globalFilter', globalFilter);
 
   const getActionsColumn = (): ColumnDef<UserParticipant> => ({
     header: "Actions",
@@ -189,9 +205,16 @@ export default function Participants({
               <Link
                 // href={`/dashboard/teacher/c/${meetingData.meetCode}/m/${meetingData.emoviewCode}/${row.original._id}`}
                 href={`/dashboard/teacher/c}`}
+                className="flex items-center"
               >
+                <ChartBarIcon className="mr-2 h-4 w-4" />
                 View Emotions Detail
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="flex items-center cursor-pointer"
+            >
+              <UserCog className="h-4 w-4" />
+              Assign as Co-Teacher
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -216,6 +239,12 @@ export default function Participants({
   const table = useReactTable({
     data,
     columns,
+    filterFns: {
+      // fuzzyFilter,
+      fuzzyFilter
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -229,6 +258,7 @@ export default function Participants({
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
   });
 
@@ -236,11 +266,19 @@ export default function Participants({
     <div className="w-full">
       <div className="flex  items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search all columns..."
+          // value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          // value={table.getColumn("row.original.user.email")?.getFilterValue() as string}
+          value={globalFilter}
+          onChange={(event) => {
+            setGlobalFilter(event.target.value)
+          }}
+
+          // onChange={(event) => {
+          //   console.log(event.target.value);
+          //   // table.getColumn("email")?.setFilterValue(event.target.value)
+          //   // table.getColumn("row.original.user.email")?.setFilterValue(event.target.value)
+          // }}
           className="max-w-sm"
         />
         <ActionTooltip label="Export meeting data">
@@ -255,7 +293,7 @@ export default function Participants({
         </ActionTooltip>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="">
+            <Button variant="outline" className="">
               Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -291,9 +329,9 @@ export default function Participants({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
