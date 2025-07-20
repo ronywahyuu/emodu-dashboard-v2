@@ -141,3 +141,52 @@ export const useDeleteMeeting = () => {
     }
   })
 }
+
+// Types for meeting participant detail
+export interface Recognition {
+  neutral: number;
+  happy: number;
+  sad: number;
+  angry: number;
+  fearful: number;
+  disgusted: number;
+  surprised: number;
+  predict: string;
+  createdAt: string;
+}
+
+export interface EmovalaroEmotion {
+  emotion: string;
+  percentage: number;
+  emotionPercentage: number;
+  valence: number;
+  arousal: number;
+}
+
+export interface MeetingParticipantDetail {
+  meeting: MeetingData;
+  participant: Participant;
+  faceApiRecognition: Recognition[];
+  emovalaroRecognition: {
+    emotions: EmovalaroEmotion[];
+    totalRecords: number;
+  } | null;
+}
+
+export type MeetingParticipantDetailResponse = BaseResponse<MeetingParticipantDetail>;
+
+export const useGetMeetingParticipantDetail = (
+  meetingId: string,
+  participantId: string,
+  recognitionModel?: 'faceapi' | 'emovalaro' | 'both'
+) => {
+  return useQuery<MeetingParticipantDetailResponse>({
+    queryKey: ["meeting-participant-detail", { meetingId, participantId, recognitionModel }],
+    queryFn: async () => {
+      return apiClient.get(`/meetings/${meetingId}/participant/${participantId}`,
+        { params: recognitionModel ? { recognitionModel } : {} }
+      ).then((res) => res.data);
+    },
+    enabled: !!meetingId && !!participantId,
+  });
+};

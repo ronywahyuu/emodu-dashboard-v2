@@ -16,8 +16,8 @@ const withPWA = withPWAInit({
 
 const nextConfig = {
   env: {
-    API_URL: 'https://rwu.my.id/api/v2',
-    NEXT_PUBLIC_API_URL: 'https://rwu.my.id/api/v2',
+    API_URL: process.env.API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 };
 

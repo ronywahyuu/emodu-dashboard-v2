@@ -32,12 +32,27 @@ import { useGetValenceArousalAnalytics } from '@/hooks/api/valence-arousal-servi
 import { Skeleton } from '@/components/ui/skeleton';
 
 
-const EmotionAnalyticsDashboard = ({ meetingCode }: {
-  meetingCode: string
-}) => {
-  console.log('meetingCode', meetingCode);
+interface EmovalaroRecognitionProps {
+  meetingCode?: string;
+  data?: any[];
+}
 
-  const { data: valaroAnalytics, isPending } = useGetValenceArousalAnalytics(meetingCode);
+const EmovalaroRecognition: React.FC<EmovalaroRecognitionProps> = ({ meetingCode, data }) => {
+  // Always call the hook, but only use its data if needed
+  const valaroAnalytics = useGetValenceArousalAnalytics(meetingCode || '');
+  let emotions: any[] | undefined;
+  let totalRecords: number | undefined;
+  let uniqueParticipants: number | undefined;
+  let isPending = false;
+
+  if (data) {
+    emotions = data;
+  } else if (meetingCode) {
+    isPending = valaroAnalytics.isPending;
+    emotions = valaroAnalytics.data?.data.emotions;
+    totalRecords = valaroAnalytics.data?.data.totalRecords;
+    uniqueParticipants = valaroAnalytics.data?.data.uniqueParticipants;
+  }
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -70,8 +85,7 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
             <CardDescription>Number of emotional responses recorded</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <p className="text-3xl font-bold">{data.totalRecords}</p> */}
-            <p className="text-3xl font-bold">{valaroAnalytics?.data.totalRecords}</p>
+            <p className="text-3xl font-bold">{totalRecords ?? '-'}</p>
           </CardContent>
         </Card>
         <Card>
@@ -80,8 +94,7 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
             <CardDescription>Number of different participants</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <p className="text-3xl font-bold">{data.uniqueParticipants}</p> */}
-            <p className="text-3xl font-bold">{valaroAnalytics?.data.uniqueParticipants}</p>
+            <p className="text-3xl font-bold">{uniqueParticipants ?? '-'}</p>
           </CardContent>
         </Card>
       </div>
@@ -94,19 +107,17 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
         </CardHeader>
         <CardContent className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            {/* <BarChart data={data.emotions}> */}
-            <BarChart data={valaroAnalytics?.data.emotions}>
+            <BarChart data={emotions}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="emotion" />
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Bar dataKey="percentage" name="Percentage">
-                {/* {data.emotions.map((entry, index) => ( */}
-                {valaroAnalytics?.data.emotions.map((entry, index) => (
+                {emotions?.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]} // Using same COLORS array as pie chart
+                    fill={COLORS[index % COLORS.length]}
                   />
                 ))}
               </Bar>
@@ -123,8 +134,7 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
         </CardHeader>
         <CardContent className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            {/* <LineChart data={data.emotions}> */}
-            <LineChart data={valaroAnalytics?.data.emotions}>
+            <LineChart data={emotions}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="emotion" />
               <YAxis />
@@ -157,8 +167,7 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
         </CardHeader>
         <CardContent className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            {/* <RadarChart outerRadius="80%" data={data.emotions}> */}
-            <RadarChart outerRadius="80%" data={valaroAnalytics?.data.emotions}>
+            <RadarChart outerRadius="80%" data={emotions}>
               <PolarGrid />
               <PolarAngleAxis dataKey="emotion" />
               <PolarRadiusAxis />
@@ -170,13 +179,6 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
                 fill="#8884d8"
                 fillOpacity={0.6}
               />
-              {/* <Radar
-                name="Emotion Percentage"
-                dataKey="emotionPercentage"
-                stroke="#82ca9d"
-                fill="#82ca9d"
-                fillOpacity={0.6}
-              /> */}
               <Radar
                 name="Arousal"
                 dataKey="arousal"
@@ -193,4 +195,4 @@ const EmotionAnalyticsDashboard = ({ meetingCode }: {
   );
 };
 
-export default EmotionAnalyticsDashboard;
+export default EmovalaroRecognition;

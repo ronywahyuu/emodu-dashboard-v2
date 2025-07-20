@@ -172,6 +172,7 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
 export default function Participants({
   participants,
   recognitionDetail,
+  meetingData,
 }: {
   participants: UserParticipant[];
   meetingData: MeetingData;
@@ -190,7 +191,10 @@ export default function Participants({
     header: "Actions",
     id: "actions",
     enableHiding: false,
-    cell: ({ }) => {
+    cell: ({ row }) => {
+      const classId = meetingData?.classId || '';
+      const meetingId = meetingData?.id || '';
+      const participantId = row.original.user.id;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -203,8 +207,7 @@ export default function Participants({
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
               <Link
-                // href={`/dashboard/teacher/c/${meetingData.meetCode}/m/${meetingData.emoviewCode}/${row.original._id}`}
-                href={`/dashboard/teacher/c}`}
+                href={`/class/${classId}/m/${meetingId}/participant/${participantId}`}
                 className="flex items-center"
               >
                 <ChartBarIcon className="mr-2 h-4 w-4" />

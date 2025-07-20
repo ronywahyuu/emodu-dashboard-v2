@@ -257,7 +257,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
             ) : (
             )} */}
               <Participants
-                meetingData={meetingData as any}
+                meetingData={meetingData?.data as any}
                 recognitionDetail={
                   recognitionsData?.data.recognitionsDetail as RecognitionsDetail
                 }
@@ -296,7 +296,7 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
             ) : (
             )} */}
                 <Participants
-                  meetingData={meetingData as any}
+                  meetingData={meetingData?.data as any}
                   recognitionDetail={
                     recognitionsData?.data.recognitionsDetail as RecognitionsDetail
                   }
