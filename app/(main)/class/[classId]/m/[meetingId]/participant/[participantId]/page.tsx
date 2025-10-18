@@ -2,7 +2,6 @@
 import React from 'react';
 import { useGetMeetingParticipantDetail } from '@/hooks/api/meeting-service-hooks';
 import LineChart from '@/components/charts/line-chart';
-import RadarChart from '@/components/charts/radar-chart';
 import EmovalaroRecognition from '@/app/(main)/class/[classId]/m/components/emovalaro-recognition';
 
 // Extend MeetingData type to include class for linter fix
@@ -16,7 +15,7 @@ const ParticipantEmotionDetailPage = ({ params }: { params: { classId: string; m
   const { data, isLoading, error } = useGetMeetingParticipantDetail(meetingId, participantId);
 
   const participant = data?.data.participant;
-  const recognition = data?.data.recognition;
+  // const recognition = data?.data.recognition;
   const meeting = data?.data.meeting as MeetingData;
   const className = meeting?.class?.name;
   const meetingName = meeting?.name;
@@ -43,22 +42,22 @@ const ParticipantEmotionDetailPage = ({ params }: { params: { classId: string; m
   }, [faceApiRecognition]);
 
   // Prepare chart data for emovalaro (radar)
-  const radarData = React.useMemo(() => {
-    if (!emovalaroRecognition || !emovalaroRecognition.emotions) return null;
-    return {
-      labels: emovalaroRecognition.emotions.map((e) => e.emotion),
-      datasets: [
-        {
-          label: 'Valence',
-          data: emovalaroRecognition.emotions.map((e) => e.valence),
-        },
-        {
-          label: 'Arousal',
-          data: emovalaroRecognition.emotions.map((e) => e.arousal),
-        },
-      ],
-    };
-  }, [emovalaroRecognition]);
+  // const radarData = React.useMemo(() => {
+  //   if (!emovalaroRecognition || !emovalaroRecognition.emotions) return null;
+  //   return {
+  //     labels: emovalaroRecognition.emotions.map((e) => e.emotion),
+  //     datasets: [
+  //       {
+  //         label: 'Valence',
+  //         data: emovalaroRecognition.emotions.map((e) => e.valence),
+  //       },
+  //       {
+  //         label: 'Arousal',
+  //         data: emovalaroRecognition.emotions.map((e) => e.arousal),
+  //       },
+  //     ],
+  //   };
+  // }, [emovalaroRecognition]);
 
   if (isLoading) return <div className="p-8">Loading...</div>;
   if (error) return <div className="p-8 text-red-500">Error loading participant details.</div>;

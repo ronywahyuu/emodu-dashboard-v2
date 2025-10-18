@@ -18,6 +18,7 @@ import { ClassData, useAddCoTeacher, useRemoveCoTeacher } from '@/hooks/api/clas
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import ActionTooltip from '@/components/action-tooltip';
 import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const ClassCard = ({ classData }: {
   classData: ClassData;
@@ -86,24 +87,31 @@ const ClassCard = ({ classData }: {
         </p>
         <div className="flex flex-col gap-2 text-sm text-gray-600">
           <span className="font-sm">Class Code:</span>
-          <code className="bg-gray-100 px-2 py-0.5 rounded *:
-            dark:bg-gray-700 dark:text-gray-100 dark:bg-opacity-50 dark:rounded-lg truncate flex items-center justify-between
-          ">
-            {classData.classCode}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={handleCopy}
-              title={copied ? "Copied!" : "Copy class code"}
-            >
-              {copied ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <Copy className="h-4 w-4 text-gray-500" />
-              )}
-            </Button>
-          </code>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <code className="bg-gray-100 px-2 py-0.5 rounded dark:bg-gray-700 dark:text-gray-100 dark:bg-opacity-50 dark:rounded-lg truncate flex items-center justify-between">
+                  {classData.classCode.slice(0, 4)}...{classData.classCode.slice(-4)}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={handleCopy}
+                    title={copied ? "Copied!" : "Copy class code"}
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </code>
+              </TooltipTrigger>
+              <TooltipContent>
+                {classData.classCode}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex flex-col gap-2 text-sm text-gray-600 mt-3">
           <span className="font-sm">Number of Meetings:</span>

@@ -12,3 +12,12 @@ export const formatName = (fullName: string) => {
   }
   return fullName;
 };
+
+
+// text ellipsis 
+export const formatTextEllipsis = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength) + '...';
+}

@@ -167,6 +167,49 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
       new Date(row.original.joinAt).toLocaleString()
     }</div>,
   },
+  {
+    accessorKey: "Status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <SortAscIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({  }) => {
+      const status = "active";
+
+      if (status === "active") {
+
+        return (
+          <div className="flex items-center gap-2">
+              <span className="text-green-500">🟢</span>
+              <span>Active</span>
+            {/* <ActionTooltip label="Active">
+            </ActionTooltip> */}
+          </div>
+        )
+      } else if (status === "inactive") {
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-red-500">🔴</span>
+            <span>Inactive</span>
+          </div>
+        );
+      } else {
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-yellow-500">🟡</span>
+            <span>Pending</span>
+          </div>
+        );
+      }
+    }
+  }
 ];
 
 export default function Participants({
@@ -270,18 +313,12 @@ export default function Participants({
       <div className="flex  items-center py-4">
         <Input
           placeholder="Search all columns..."
-          // value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          // value={table.getColumn("row.original.user.email")?.getFilterValue() as string}
           value={globalFilter}
           onChange={(event) => {
             setGlobalFilter(event.target.value)
           }}
 
-          // onChange={(event) => {
-          //   console.log(event.target.value);
-          //   // table.getColumn("email")?.setFilterValue(event.target.value)
-          //   // table.getColumn("row.original.user.email")?.setFilterValue(event.target.value)
-          // }}
+       
           className="max-w-sm"
         />
         <ActionTooltip label="Export meeting data">
