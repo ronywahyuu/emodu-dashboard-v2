@@ -48,6 +48,7 @@ import { useModalStore } from "@/hooks/use-modal-store";
 import { MeetingData } from "@/hooks/api/meeting-service-hooks";
 import ActionTooltip from "@/components/action-tooltip";
 import { RecognitionsDetail } from "@/hooks/api/recognition-service-hooks";
+import { Label } from "@/components/ui/label";
 // import { RecognitionsDetail } from "@/lib/api/types.recognition";
 // import ActionTooltip from "../action-tooltip";
 export interface UserParticipant {
@@ -57,6 +58,8 @@ export interface UserParticipant {
   avatar: string;
   joinAt: string;
   leftAt: string;
+  status: number;
+  leave_count: number;
   user: {
     id: string;
     fullname: string;
@@ -65,8 +68,12 @@ export interface UserParticipant {
   };
 }
 
-const fuzzyFilter: FilterFn<UserParticipant> = (row, columnId, filterValue: string) => {
-  console.log('row', row);
+const fuzzyFilter: FilterFn<UserParticipant> = (
+  row,
+  columnId,
+  filterValue: string,
+) => {
+  console.log("row", row);
   const searchValue = filterValue.toLowerCase();
 
   // Search in user object
@@ -81,14 +88,18 @@ const fuzzyFilter: FilterFn<UserParticipant> = (row, columnId, filterValue: stri
 
   // Search in join date
   if (row.original.joinAt) {
-    if (new Date(row.original.joinAt).toLocaleString().toLowerCase().includes(searchValue)) {
+    if (
+      new Date(row.original.joinAt)
+        .toLocaleString()
+        .toLowerCase()
+        .includes(searchValue)
+    ) {
       return true;
     }
   }
 
   return false;
 };
-
 
 export const columnsData: ColumnDef<UserParticipant>[] = [
   {
@@ -146,7 +157,9 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.original.user.email}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.original.user.email}</div>
+    ),
     enableColumnFilter: true,
     enableSorting: true,
   },
@@ -163,9 +176,11 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{
-      new Date(row.original.joinAt).toLocaleString()
-    }</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">
+        {new Date(row.original.joinAt).toLocaleString()}
+      </div>
+    ),
   },
   {
     accessorKey: "Status",
@@ -178,26 +193,34 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
           Status
           <SortAscIcon className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
-    cell: ({  }) => {
-      const status = "active";
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const leaveCount = row.original.leave_count;
 
-      if (status === "active") {
-
+      if (status === 1) {
         return (
           <div className="flex items-center gap-2">
-              <span className="text-green-500">🟢</span>
-              <span>Active</span>
-            {/* <ActionTooltip label="Active">
-            </ActionTooltip> */}
+            <span className="text-green-500">🟢</span>
+            <span>Active</span>
+            {leaveCount > 0 && (
+              <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
+                <Label>({leaveCount})</Label>
+              </ActionTooltip>
+            )}
           </div>
-        )
-      } else if (status === "inactive") {
+        );
+      } else if (status === 0) {
         return (
           <div className="flex items-center gap-2">
             <span className="text-red-500">🔴</span>
             <span>Inactive</span>
+            {leaveCount > 0 && (
+              <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
+                <Label>({leaveCount})</Label>
+              </ActionTooltip>
+            )}
           </div>
         );
       } else {
@@ -208,8 +231,8 @@ export const columnsData: ColumnDef<UserParticipant>[] = [
           </div>
         );
       }
-    }
-  }
+    },
+  },
 ];
 
 export default function Participants({
@@ -225,18 +248,17 @@ export default function Participants({
   const { onOpen } = useModalStore();
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-
   // console.log(participants);
 
-  console.log('globalFilter', globalFilter);
+  console.log("globalFilter", globalFilter);
 
   const getActionsColumn = (): ColumnDef<UserParticipant> => ({
     header: "Actions",
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const classId = meetingData?.classId || '';
-      const meetingId = meetingData?.id || '';
+      const classId = meetingData?.classId || "";
+      const meetingId = meetingData?.id || "";
       const participantId = row.original.user.id;
       return (
         <DropdownMenu>
@@ -257,8 +279,7 @@ export default function Participants({
                 View Emotions Detail
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center cursor-pointer"
-            >
+            <DropdownMenuItem className="flex items-center cursor-pointer">
               <UserCog className="h-4 w-4" />
               Assign as Co-Teacher
             </DropdownMenuItem>
@@ -276,7 +297,7 @@ export default function Participants({
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -287,7 +308,7 @@ export default function Participants({
     columns,
     filterFns: {
       // fuzzyFilter,
-      fuzzyFilter
+      fuzzyFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
@@ -315,18 +336,14 @@ export default function Participants({
           placeholder="Search all columns..."
           value={globalFilter}
           onChange={(event) => {
-            setGlobalFilter(event.target.value)
+            setGlobalFilter(event.target.value);
           }}
-
-       
           className="max-w-sm"
         />
         <ActionTooltip label="Export meeting data">
           <Button
             className="ml-auto mr-2"
-            onClick={() =>
-              onOpen("exportMeetingData", recognitionDetail)
-            }
+            onClick={() => onOpen("exportMeetingData", recognitionDetail)}
           >
             <Download className="mr-2 h-4 w-4" /> Export
           </Button>
@@ -369,9 +386,9 @@ export default function Participants({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   );
                 })}
@@ -389,7 +406,7 @@ export default function Participants({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
