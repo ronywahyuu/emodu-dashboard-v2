@@ -47,7 +47,10 @@ import Link from "next/link";
 import { useModalStore } from "@/hooks/use-modal-store";
 import { MeetingData } from "@/hooks/api/meeting-service-hooks";
 import ActionTooltip from "@/components/action-tooltip";
-import { RecognitionsDetail } from "@/hooks/api/recognition-service-hooks";
+import {
+  RecognitionsDetail,
+  useToggleMonitoring,
+} from "@/hooks/api/recognition-service-hooks";
 import { Label } from "@/components/ui/label";
 // import { RecognitionsDetail } from "@/lib/api/types.recognition";
 // import ActionTooltip from "../action-tooltip";
@@ -101,140 +104,6 @@ const fuzzyFilter: FilterFn<UserParticipant> = (
   return false;
 };
 
-export const columnsData: ColumnDef<UserParticipant>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: true,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "fullname",
-    // header: "Fullname",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Fullname
-          <SortAscIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.original.user.fullname}</div>
-    ),
-    enableColumnFilter: true,
-    enableSorting: true,
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <SortAscIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.original.user.email}</div>
-    ),
-    enableColumnFilter: true,
-    enableSorting: true,
-  },
-  {
-    accessorKey: "joinAt",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last Join
-          <SortAscIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">
-        {new Date(row.original.joinAt).toLocaleString()}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "Status",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <SortAscIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const leaveCount = row.original.leave_count;
-
-      if (status === 1) {
-        return (
-          <div className="flex items-center gap-2">
-            <span className="text-green-500">🟢</span>
-            <span>Active</span>
-            {leaveCount > 0 && (
-              <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
-                <Label>({leaveCount})</Label>
-              </ActionTooltip>
-            )}
-          </div>
-        );
-      } else if (status === 0) {
-        return (
-          <div className="flex items-center gap-2">
-            <span className="text-red-500">🔴</span>
-            <span>Inactive</span>
-            {leaveCount > 0 && (
-              <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
-                <Label>({leaveCount})</Label>
-              </ActionTooltip>
-            )}
-          </div>
-        );
-      } else {
-        return (
-          <div className="flex items-center gap-2">
-            <span className="text-yellow-500">🟡</span>
-            <span>Pending</span>
-          </div>
-        );
-      }
-    },
-  },
-];
-
 export default function Participants({
   participants,
   recognitionDetail,
@@ -245,12 +114,18 @@ export default function Participants({
   recognitionDetail: RecognitionsDetail;
 }) {
   const data = participants;
+  const toggleMonitoring = useToggleMonitoring();
   const { onOpen } = useModalStore();
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [statusOn, setStatusOn] = React.useState(true);
 
-  // console.log(participants);
-
-  console.log("globalFilter", globalFilter);
+  const handleToggleMonitoring = async () => {
+    setStatusOn((prev) => !prev);
+    await toggleMonitoring.mutateAsync({
+      meetingCode: meetingData.meetingCode,
+      isMonitoring: statusOn,
+    });
+  };
 
   const getActionsColumn = (): ColumnDef<UserParticipant> => ({
     header: "Actions",
@@ -288,6 +163,136 @@ export default function Participants({
       );
     },
   });
+
+  const columnsData: ColumnDef<UserParticipant>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "fullname",
+      // header: "Fullname",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Fullname
+            <SortAscIcon className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize">{row.original.user.fullname}</div>
+      ),
+      enableColumnFilter: true,
+      enableSorting: true,
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Email
+            <SortAscIcon className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="lowercase">{row.original.user.email}</div>
+      ),
+      enableColumnFilter: true,
+      enableSorting: true,
+    },
+    {
+      accessorKey: "joinAt",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Last Join
+            <SortAscIcon className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="lowercase">
+          {new Date(row.original.joinAt).toLocaleString()}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "Status",
+      header: () => (
+        <StatusHeader
+          isOn={statusOn}
+          toggle={handleToggleMonitoring}
+          isLoading={toggleMonitoring.isPending}
+        />
+      ),
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const leaveCount = row.original.leave_count;
+
+        if (status === 1) {
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-green-500">🟢</span>
+              <span>Active</span>
+              {leaveCount > 0 && (
+                <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
+                  <Label>({leaveCount})</Label>
+                </ActionTooltip>
+              )}
+            </div>
+          );
+        } else if (status === 0) {
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-red-500">🔴</span>
+              <span>Inactive</span>
+              {leaveCount > 0 && (
+                <ActionTooltip label={`Terdeteksi Keluar : ${leaveCount}`}>
+                  <Label>({leaveCount})</Label>
+                </ActionTooltip>
+              )}
+            </div>
+          );
+        } else {
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-500">🟡</span>
+              <span>Pending</span>
+            </div>
+          );
+        }
+      },
+    },
+  ];
 
   const columns: ColumnDef<UserParticipant>[] = [
     // ... other columns
@@ -452,3 +457,40 @@ export default function Participants({
     </div>
   );
 }
+
+const StatusHeader: React.FC<{
+  isOn: boolean;
+  toggle: () => void;
+  isLoading: boolean;
+}> = ({ isOn, toggle, isLoading }) => {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className="relative inline-block">
+      <Button
+        variant="ghost"
+        onClick={() => setOpen(!open)}
+        className="flex items-center"
+        disabled={isLoading}
+      >
+        {isLoading ? "Loading..." : "Status"}
+        <SortAscIcon className="ml-2 h-4 w-4" />
+      </Button>
+
+      {open && (
+        <div className="absolute left-0 mt-2 bg-white border rounded-md shadow-md p-2 z-20">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="status-toggle">On/Off</Label>
+            <Button
+              id="status-toggle"
+              size="sm"
+              variant={isOn ? "default" : "outline"}
+              onClick={toggle}
+            >
+              {isOn ? "ON" : "OFF"}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
