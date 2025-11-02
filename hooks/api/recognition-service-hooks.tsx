@@ -129,7 +129,7 @@ export const useToggleMonitoring = () => {
       isMonitoring: boolean;
     }) => {
       return apiClient
-        .patch(`/update/${meetingCode}/monitoring`, {
+        .patch(`/meetings/update/${meetingCode}/monitoring`, {
           isMonitoring,
         })
         .then((res) => res.data);
@@ -167,4 +167,3 @@ export const useSelectRecognitionModel = () => {
     },
   });
 };
-
