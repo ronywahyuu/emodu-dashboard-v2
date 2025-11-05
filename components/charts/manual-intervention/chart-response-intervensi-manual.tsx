@@ -1,86 +1,53 @@
 "use client";
 
-import {
-  RadialBarChart,
-  RadialBar,
-  PolarRadiusAxis,
-  Label,
-  ResponsiveContainer,
-} from "recharts";
+// Ganti nama hook sesuai nama yang benar yang kita set sebelumnya: useGetIntervensionResponseCount
+import { ResponseCountData, useGetResponseCount } from "@/hooks/api/manual-service-hooks"; 
+import { Loader2 } from "lucide-react";
 
-const chartData = [{ name: "result", response: 25, nonresponse: 10 }];
-//ini nanti ambil data dari hook api
+interface ChartResponseProps {
+  meetingId: string; 
+  interventionId: string;
+}
 
-export function ChartResponse() {
-  const totalResponse = chartData[0].response;
-  const totalNonResponse = chartData[0].nonresponse;
-  const totalParticipant = totalResponse + totalNonResponse;
+// Hapus variabel chartData yang tidak perlu
+// const chartData = [{ name: "result", response: 25, nonresponse: 10 }]; 
 
-  return (
-    <div className="">
-      {/* Chart */}
-      {/* <ResponsiveContainer width={200} height={150}>
-        <RadialBarChart
-          data={chartData}
-          innerRadius={40}
-          outerRadius={80}
-          endAngle={180}
-        >
-          <PolarRadiusAxis tick={false} axisLine={false}>
-            <Label
-              content={({ viewBox }) => {
-                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                  return (
-                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                      <tspan
-                        x={viewBox.cx}
-                        y={(viewBox.cy || 0) - 10}
-                        className="fill-foreground text-lg font-bold"
-                      >
-                        {totalParticipant}
-                      </tspan>
-                      <tspan
-                        x={viewBox.cx}
-                        y={(viewBox.cy || 0) + 12}
-                        className="fill-muted-foreground text-xs"
-                      >
-                        Total
-                      </tspan>
-                    </text>
-                  )
-                }
-              }}
-            />
-          </PolarRadiusAxis>
+export function ChartResponse({ meetingId, interventionId }: ChartResponseProps) {
 
-          <RadialBar
-            dataKey="response"
-            fill="#10B981"
-            stackId="a"
-            cornerRadius={5}
-          />
-          <RadialBar
-            dataKey="nonresponse"
-            fill="#EF4444"
-            stackId="a"
-            cornerRadius={5}
-          />
-        </RadialBarChart>
-      </ResponsiveContainer> */}
+  // ✅ Panggil hook, gunakan destructuring untuk data, isLoading
+  const { 
+      data: responseRate, // Ganti nama data menjadi responseRate
+      isLoading,
+      isError 
+  } = useGetResponseCount(meetingId, interventionId);
 
-      {/* Keterangan rapet */}
-      {/* <div className=" flex flex-col gap-1 text-xs mt-5">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500" />
-          <span>Response: {totalResponse}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
-          <span>NonResponse: {totalNonResponse}</span>
-        </div>
-      </div> */}
-      <span className="text-green-600">• Response: {totalResponse}  </span>
-      <span className="text-red-600">• NonResponse: {totalNonResponse}</span>
-    </div>
-  );
+  // --- Handling Loading dan Error ---
+  if (isLoading) {
+    return (
+      <div className="flex items-center text-xs text-gray-500">
+        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+        Memuat...
+      </div>
+    );
+  }
+
+  // Cek jika tidak ada data sama sekali (termasuk kasus error)
+  if (!responseRate || isError) {
+    return (
+      <div className="text-gray-500 text-xs">
+        Data N/A
+      </div>
+    );
+  }
+  // --- Akhir Handling ---
+
+  // ✅ Gunakan data dari hook yang sudah terambil
+  const { totalResponses, totalNonResponses } = responseRate;
+
+  return (
+  <div className="">
+      <span className="text-green-600">• Response: {totalResponses}  </span>
+      <span className="text-red-600">• NonResponse: {totalNonResponses}</span>
+  </div>
+)
 }

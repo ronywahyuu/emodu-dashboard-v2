@@ -180,8 +180,8 @@ export default function UserDetailThread({
 
                 {/* Chart Response (ASUMSI komponen ini dapat bekerja) */}
                 <div className="flex items-center text-xs space-x-2">
-                  <ChartResponse />
-                </div>
+                  <ChartResponse meetingId={currentMeetingId} interventionId={intervention.id}/>
+                </div>  
 
                 {/* Toggle Button */}
                 <Button

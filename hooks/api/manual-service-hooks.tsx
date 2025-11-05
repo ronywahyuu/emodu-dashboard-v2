@@ -3,6 +3,7 @@
   import apiClient from "@/lib/axios-instance";
   import { BaseResponse } from "@/constants/types";
   import { toast } from "sonner";
+  import { useGetProfile } from "@/hooks/api/user-service-hooks";
 
   export type WgctaTemplates = {
     INFERENCE: string[];
@@ -36,6 +37,10 @@
     createdAt: string;
     givenBy: string;
     meetingId: string;
+    response: { 
+      id: string;
+      response: string;
+    };
   }
 
   export interface Response {
@@ -74,7 +79,29 @@
       meetingId: string;
   }
 
+  //gift feedback
+  export interface StudentFeedbackPayload extends Feedback{
+    response: Response; 
+  }
 
+  export interface ResponseCountData {
+    totalResponses: number;
+    totalNonResponses: number;
+    totalParticipants: number;
+  }
+
+  export const useGetResponseCount = (meetingId? : string, interventionId?: string) => {
+    console.log("hook useGetResponseCount dipanggil ✅");
+    const enable = !!meetingId && !!interventionId;
+    return useQuery<ResponseCountData>({
+      queryKey: ["manual-response-rate", meetingId, interventionId],
+      enabled: enable,
+      queryFn: async () => {
+        const res = await apiClient.get(`/manual-intervention/response-rate/${meetingId}/${interventionId}`);
+        return res.data;
+      }
+    });
+  }
 
   export const useCreateManualIntervention = () => {
       const queryClient = useQueryClient();
@@ -178,3 +205,39 @@
       },
     });
   };
+
+  export const useGetAllStudentFeedbacksByMeeting = (meetingId?: string) => {
+    const { data: profileData } = useGetProfile();
+    const userId = profileData?.data?.id;
+    const enabled = !!meetingId && !!userId;
+    return useQuery<Feedback[]>({
+      queryKey: ["student-feedbacks", meetingId, userId],
+      enabled: enabled,
+      queryFn: async () => {
+        console.log(`Hook useGetAllStudentFeedbacks dipanggil untuk Meeting ID: ${meetingId} ✅ dan user ID: ${userId}`);
+
+        const params = new URLSearchParams();
+        params.append('meetingId', meetingId!);
+        params.append('userId', userId!);
+        const res = await apiClient.get(`/manual-intervention/feedbacks/student?${params.toString()}`);
+        return res.data;
+      },
+      refetchOnWindowFocus: false,
+      staleTime: 5000
+    });
+  }
+
+  // export const useGetIntervensionResponseCount = (meetingId?: string) => {
+  //   return useQuery<ResponseCountData>({
+  //     queryKey: ["manual-response-rate", meetingId],
+  //     enabled: !!meetingId,
+  //     queryFn: async () => {
+  //       console.log(`Hook useGetInterventionResponseCount dipanggil untuk Meeting ID: ${meetingId} ✅`);
+  //       // Panggil endpoint baru
+  //       const res = await apiClient.get(`/manual-intervention/response-rate/${meetingId}`); 
+  //       return res.data;
+  //     },
+  //     refetchOnWindowFocus: false,
+  //     staleTime: 5000
+  //   });
+  // }
