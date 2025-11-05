@@ -73,7 +73,6 @@ export function InterventionPanel({ meetingCode }: InterventionPanelProps) {
     const payload: CreateManualInterventionDto = {
       text: customMessage.trim(),
       wgctaType: selectedWgctaType,
-      // ✅ createdBy dan meetingId diambil dari data Meeting yang valid
       createdBy: currentUserId, 
       meetingId: currentMeetingId,
     };
