@@ -49,6 +49,7 @@ import { MeetingData } from "@/hooks/api/meeting-service-hooks";
 import ActionTooltip from "@/components/action-tooltip";
 import {
   RecognitionsDetail,
+  useResetDataMonitoring,
   useToggleMonitoring,
 } from "@/hooks/api/recognition-service-hooks";
 import { Label } from "@/components/ui/label";
@@ -115,6 +116,7 @@ export default function Participants({
 }) {
   const data = participants;
   const toggleMonitoring = useToggleMonitoring();
+  const resetDataMonitoring = useResetDataMonitoring();
   const { onOpen } = useModalStore();
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [statusOn, setStatusOn] = React.useState(true);
@@ -124,6 +126,12 @@ export default function Participants({
     await toggleMonitoring.mutateAsync({
       meetingCode: meetingData.meetingCode,
       isMonitoring: statusOn,
+    });
+  };
+
+  const handleResetDataMonitoring = async () => {
+    await resetDataMonitoring.mutateAsync({
+      meetingCode: meetingData.meetingCode,
     });
   };
 
@@ -252,6 +260,7 @@ export default function Participants({
           isOn={statusOn}
           toggle={handleToggleMonitoring}
           isLoading={toggleMonitoring.isPending}
+          clearData={handleResetDataMonitoring}
         />
       ),
       cell: ({ row }) => {
@@ -461,8 +470,9 @@ export default function Participants({
 const StatusHeader: React.FC<{
   isOn: boolean;
   toggle: () => void;
+  clearData: () => void;
   isLoading: boolean;
-}> = ({ isOn, toggle, isLoading }) => {
+}> = ({ isOn, toggle, clearData, isLoading }) => {
   const [open, setOpen] = React.useState(false);
   return (
     <div className="relative inline-block">
@@ -487,6 +497,16 @@ const StatusHeader: React.FC<{
               onClick={toggle}
             >
               {isOn ? "ON" : "OFF"}
+            </Button>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              id="status-toggle"
+              size="sm"
+              variant="destructive"
+              onClick={clearData}
+            >
+              Clear Data
             </Button>
           </div>
         </div>

@@ -140,6 +140,20 @@ export const useToggleMonitoring = () => {
   });
 };
 
+export const useResetDataMonitoring = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ meetingCode }: { meetingCode: string }) => {
+      return apiClient
+        .post(`/meetings/${meetingCode}/reset-data-monitoring`)
+        .then((res) => res.data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+};
+
 export interface SelectRecognitionModelDto {
   RecognitionModel: number;
 }
