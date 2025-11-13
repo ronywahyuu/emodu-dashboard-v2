@@ -10,6 +10,7 @@ export interface MeetingData {
   link: string
   isStarted: boolean
   isEnded: boolean
+  isMonitoring: boolean
   isRecognitionStarted: boolean
   isRecognitionEnded: boolean
   selectedRecognitionModel: 'EMOVALARO' | 'FACE_API'
