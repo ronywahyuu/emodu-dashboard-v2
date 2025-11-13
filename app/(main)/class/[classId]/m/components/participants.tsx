@@ -119,13 +119,11 @@ export default function Participants({
   const resetDataMonitoring = useResetDataMonitoring();
   const { onOpen } = useModalStore();
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [statusOn, setStatusOn] = React.useState(meetingData.isMonitoring ?? false);
 
   const handleToggleMonitoring = async () => {
-    setStatusOn((prev) => !prev);
     await toggleMonitoring.mutateAsync({
       meetingCode: meetingData.meetingCode,
-      isMonitoring: statusOn,
+      isMonitoring: !meetingData.isMonitoring,
     });
   };
 
@@ -257,7 +255,7 @@ export default function Participants({
       accessorKey: "Status",
       header: () => (
         <StatusHeader
-          isOn={statusOn}
+          isOn={meetingData.isMonitoring}
           toggle={handleToggleMonitoring}
           isLoading={toggleMonitoring.isPending}
           clearData={handleResetDataMonitoring}

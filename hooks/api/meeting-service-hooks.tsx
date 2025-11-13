@@ -66,7 +66,7 @@ export const useGetMeetingByMeetingCode = (meetingCode: string,
   enabled: boolean = true
 ) => {
   return useQuery<MeetingDetailResponse>({
-    queryKey: ["meeting", { meetingCode }],
+    queryKey: ["meeting", meetingCode],
     queryFn: async () => {
       return apiClient.get(`/meetings/meet-code/${meetingCode}`)
         .then((res) => res.data);

@@ -1,3 +1,4 @@
+import MeetingDetailPage from "@/app/(main)/class/[classId]/m/[meetingId]/page";
 import { BaseResponse } from "@/constants/types";
 import apiClient from "@/lib/axios-instance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -134,8 +135,9 @@ export const useToggleMonitoring = () => {
         })
         .then((res) => res.data);
     },
-    onSuccess: () => {
+    onSuccess: (_, { meetingCode }) => {
       queryClient.invalidateQueries();
+      queryClient.invalidateQueries({queryKey: ['meetings']});
     },
   });
 };
