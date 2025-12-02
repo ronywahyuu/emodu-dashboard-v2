@@ -112,10 +112,13 @@
               const res = await apiClient.post("/manual-intervention/create", dto); 
               return res.data;
           },
-          onSuccess: (data) => {
+          onSuccess: (data: ManualIntervention) => {
               toast.success("Pesan intervensi dikirimkan! 🚀");
               // Optional: Invalidate query untuk memperbarui daftar intervensi jika ada di dashboard
-              queryClient.invalidateQueries({ queryKey: ["manual-interventions"] }); 
+              // queryClient.invalidateQueries({ queryKey: ["manual-interventions"] }); 
+              queryClient.invalidateQueries({ 
+                queryKey: ["all-interventions-all-responses", data.meetingId] 
+            });
           },
           onError: (error) => {
               console.error("Gagal mengirim intervensi manual:", error);
@@ -136,51 +139,51 @@
     });
   };
 
-  export const useGetAllManualInterventions = (meetingId?: string) => {
-    // Gunakan meetingId dalam queryKey agar query dijalankan ulang saat nilainya berubah
-    return useQuery<ManualIntervention[]>({
-      queryKey: ["manual-interventions", meetingId],
-      // Query hanya dijalankan jika meetingId (ID Meeting) sudah tersedia
-      enabled: !!meetingId, 
-      queryFn: async () => {
-        console.log(`Hook useGetAllManualInterventions dipanggil untuk Meeting ID: ${meetingId} ✅`);
-        
-        // Kirim meetingId sebagai query parameter
-        const params = new URLSearchParams();
-        if (meetingId) {
-            // params.append('meetingId', meetingId); akan menghasilkan: /manual-intervention?meetingId=ID_MEETING
-            params.append('meetingId', meetingId); 
-        }
-        
-        // Kirim permintaan dengan query parameter
-        const res = await apiClient.get(`/manual-intervention?${params.toString()}`); 
-        return res.data;
-      },
-      refetchOnWindowFocus: false
-    });
+  export const useGetAllInterventionsAndResponses = (meetingId?: string) => {
+      console.log("hook useGetAllInterventionsAndResponses dipanggil ✅");
+      
+      // Query hanya dijalankan jika meetingId tersedia
+      const enabled = !!meetingId;
+
+      return useQuery<ManualIntervention[]>({
+          // Query key: Unik berdasarkan meetingId
+          // Kita tidak perlu userId lagi di key ini
+          queryKey: ["all-interventions-all-responses", meetingId],
+          
+          enabled: enabled,
+          
+          queryFn: async () => {
+              console.log(`Hook useGetAllInterventionsAndResponses dipanggil untuk Meeting ID: ${meetingId}`);
+              
+              // Panggil endpoint Controller yang baru dibuat (asumsi endpoint-nya: /manual-intervention/interventions/all-responses?meetingId=...)
+              return apiClient.get(
+                  `/manual-intervention/interventions/all-responses?meetingId=${meetingId}`) // Ganti dengan endpoint Anda yang baru              
+              // Data yang dikembalikan adalah array ManualIntervention
+              .then((res) => res.data);
+          },
+          refetchOnWindowFocus: true
+      });
   };
 
-  export const useGetByResponsesIdInterventions = (meetingId?: string) => {
-    return useQuery<Response[]>({
-      queryKey: ["Response-interventions", meetingId],
-      enabled: !!meetingId,
-      queryFn: async () => {
-        console.log(`Hook useGetAllManualInterventions dipanggil untuk Meeting ID: ${meetingId} ✅`);
+  //   export const useGetByResponsesIdInterventions = (meetingId?: string) => {
+  //   return useQuery<Response[]>({
+  //     queryKey: ["Response-interventions", meetingId],
+  //     enabled: !!meetingId,
+  //     queryFn: async () => {
+  //       console.log(`Hook useGetAllManualInterventions dipanggil untuk Meeting ID: ${meetingId} ✅`);
+  //       const params = new URLSearchParams();
+  //       if (meetingId) {
+  //           // params.append('meetingId', meetingId); akan menghasilkan: /manual-intervention?meetingId=ID_MEETING
+  //           params.append('meetingId', meetingId); 
+  //       }
+  //        // Kirim permintaan dengan query parameter
+  //       const res = await apiClient.get(`/manual-intervention?${params.toString()}`); 
+  //       return res.data;
+  //     },
+  //     refetchOnWindowFocus: true
+  //   });
+  // };
         
-        // Kirim meetingId sebagai query parameter
-        const params = new URLSearchParams();
-        if (meetingId) {
-            // params.append('meetingId', meetingId); akan menghasilkan: /manual-intervention?meetingId=ID_MEETING
-            params.append('meetingId', meetingId); 
-        }
-        
-        // Kirim permintaan dengan query parameter
-        const res = await apiClient.get(`/manual-intervention?${params.toString()}`); 
-        return res.data;
-      },
-      refetchOnWindowFocus: false
-    });
-  };
 
   export const useCreateManualFeedback = () => {
     const queryClient = useQueryClient();
@@ -195,6 +198,13 @@
         
         // Invalidasi query agar data intervensi otomatis diperbarui di UI
         queryClient.invalidateQueries({ queryKey: ["manual-interventions"] }); 
+
+        const meetingId = variables.meetingId; 
+
+            // Invalidate query key yang digunakan dashboard
+            queryClient.invalidateQueries({
+                queryKey: ["all-interventions-all-responses", meetingId],
+            });
         
         // Optional: Update cache spesifik jika diperlukan
         // queryClient.setQueryData(["manual-interventions", variables.responseId], (oldData) => { ... }); 
@@ -222,7 +232,7 @@
         const res = await apiClient.get(`/manual-intervention/feedbacks/student?${params.toString()}`);
         return res.data;
       },
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       staleTime: 5000
     });
   }

@@ -109,7 +109,7 @@ export function InterventionPanel({ meetingCode }: InterventionPanelProps) {
           Panel Intervensi Manual
         </CardTitle>
         <CardDescription>
-          Kirim pesan ke Meeting {meetingCode} secara langsung.
+          Kirim pesan ke meeting secara langsung.
         </CardDescription>
       </CardHeader>
 
