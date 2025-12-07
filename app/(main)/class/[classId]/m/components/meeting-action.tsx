@@ -45,8 +45,10 @@ export default function MeetingActions({
 
   const startRecognition = useStartRecognition();
   const stopRecognition = useStopRecognition();
+ 
   const {
     data: meetingData,
+    refetch: refetchMeeting,
   } = useGetMeetingByMeetingCode(meetingCode);
 
   const [showParticipants, setShowParticipants] = useState(false)
@@ -101,7 +103,7 @@ export default function MeetingActions({
 
   const [selectedModel, setSelectedModel] = useState(meetingData?.data.selectedRecognitionModel || 'NONE');
   const [isRecognitionSwitchedOn, setIsRecognitionSwitchedOn] = useState(meetingData?.data.isRecognitionStarted);
-  const [toggleMutedState, setToggleMutedState] = useState(meetingData?.data.isMutedAll); // FAKHRA
+  // const [toggleMutedState, setToggleMutedState] = useState(meetingData?.data.isMutedAll ?? false); // FAKHRA
 
   useEffect(() => {
     if (selectedModel === 'NONE') {
@@ -214,47 +216,31 @@ export default function MeetingActions({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-    //FAKHRA 
-//   const toggleMuted = useToggleMutedExtensions();
-//   const handleToggleMuteAll = async (checked: boolean) => {
-//   if (!meetingData?.data) return;
-//   if (toggleMuted.isPending) return; // cegah klik spam
-
-//   try {
-//     await toggleMuted.mutateAsync(meetingCode);
-//     toast.success(
-//       checked ? "All extensions have been muted." : "All extensions have been unmuted."
-//     );
-//   } catch (error: any) {
-//     toast.error(
-//       error?.response?.data?.message || "Failed to toggle mute state."
-//     );
-//   }
-// };
-
-  // const handleToggleMuteAll = () => {
-  //   toggleMutedExtensions.mutate(meetingCode);
-  // };
 
   //FAKHRA
   const toggleMutedExtensions = useToggleMutedExtensions();
-
-  // const handleToggleMuteAll = async (checked: boolean) => {
-  //   setToggleMutedState(checked);
-
-  //   if (checked) {
-  //     await toggleMutedExtensions.mutateAsync(meetingData?.data.meetingCode as string, {
-  //       onSuccess: () => {
-  //         toast.success("Muted on");
-  //       },
-  //       onError: () => {
-  //         toast.error("Failed to mute all extensions")
-  //         setToggleMutedState(false);
-  //       }
-  //     });
-  //   }
-  // }
-
+  const handleToggleMutedExtensions = () => {
+  // Ambil status saat ini sebelum di-mutate
+  const currentlyMuted = meetingData?.data.isMutedAll ?? false;
+  
+  toggleMutedExtensions.mutate(meetingCode, {
+    onSuccess: () => {
+      // Tampilkan toast berdasarkan status BARU (kebalikan dari status sebelumnya)
+      if (currentlyMuted) {
+        // Jika sebelumnya muted, sekarang unmuted (mati)
+        toast.success("Extensions Unmuted.");
+      } else {
+        // Jika sebelumnya tidak muted, sekarang muted (aktif)
+        toast.success("Extensions Muted (Active).");
+      }
+      // Opsional: refetch data meeting jika diperlukan untuk sinkronisasi UI yang lebih ketat
+      // refetchMeeting(); 
+    },
+    onError: () => {
+      toast.error("Failed to change mute status.");
+    }
+  });
+};
 
   return (
     <>
@@ -293,7 +279,7 @@ export default function MeetingActions({
                     <span className="text-sm text-neutral-500 dark:text-neutral-400">Off</span>
                     <Switch
                         checked={meetingData?.data.isMutedAll ?? false}
-                        onCheckedChange={() => toggleMutedExtensions.mutate(meetingCode)}
+                        onCheckedChange={handleToggleMutedExtensions}
                         disabled={toggleMutedExtensions.isPending}
                       className="data-[state=checked]:bg-sky-600 dark:data-[state=checked]:bg-sky-700"
                     />

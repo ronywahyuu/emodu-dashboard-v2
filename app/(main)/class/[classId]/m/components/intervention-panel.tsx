@@ -139,7 +139,7 @@ export function InterventionPanel({ meetingCode }: InterventionPanelProps) {
                 </TooltipTrigger>
 
                 <TooltipContent>
-                  <p>Quick Messages (WGCTA)</p>
+                  <p>Quick Messages</p>
                 </TooltipContent>
 
                 <PopoverContent
@@ -186,7 +186,7 @@ export function InterventionPanel({ meetingCode }: InterventionPanelProps) {
           </div>
           {selectedWgctaType && (
             <p className="text-xs text-green-600 font-medium">
-              WGCTA Type Terpilih: {selectedWgctaType}
+              Type Quick Message: {selectedWgctaType}
             </p>
           )}
         </div>
