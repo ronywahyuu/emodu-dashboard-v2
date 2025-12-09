@@ -118,7 +118,17 @@ function GetExtensionPage() {
             <CardContent>
               <ul className="space-y-4">
                 <li>
-                  <h4 className="text-sm font-semibold">05 December 2024 (Latest)</h4>
+                  <h4 className="text-sm font-semibold">09 December 2025 (Latest)</h4>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                    <li>
+                      Drosiness detection
+                      Monitoring
+                    </li>
+
+                  </ul>
+                </li>
+                <li>
+                  <h4 className="text-sm font-semibold">05 December 2024</h4>
                   <ul className="list-disc list-inside text-sm text-muted-foreground">
                     <li>
                       Update new way to select reinforcement type for affective intervention
