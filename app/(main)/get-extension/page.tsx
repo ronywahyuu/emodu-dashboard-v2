@@ -121,8 +121,8 @@ function GetExtensionPage() {
                   <h4 className="text-sm font-semibold">09 December 2025 (Latest)</h4>
                   <ul className="list-disc list-inside text-sm text-muted-foreground">
                     <li>
-                      Drosiness detection
-                      Monitoring
+                      Drosiness detection.
+                      Monitoring participants.
                     </li>
 
                   </ul>
