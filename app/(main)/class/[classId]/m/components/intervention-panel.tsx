@@ -176,7 +176,7 @@ export function InterventionPanel({ meetingCode }: InterventionPanelProps) {
 
             {/* Textarea */}
             <Textarea
-              placeholder="Tulis pesan untuk siswa..."
+              placeholder="Tulis pesan intervensi manual di sini..."
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
               rows={3}

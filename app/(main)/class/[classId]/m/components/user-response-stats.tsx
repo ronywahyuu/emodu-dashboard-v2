@@ -285,7 +285,7 @@ export default function UserDetailThread({
                   })}
                   {intervention.responses.length === 0 && (
                     <div className="text-center text-gray-500 p-4">
-                      Belum ada balasan dari siswa.
+                      Belum ada balasan.
                     </div>
                   )}
                 </div>
