@@ -17,7 +17,7 @@ import { usePiPWindow } from "@/context/pip-provider";
 import DoughnutChart from "@/components/charts/doughnut-chart";
 import { Switch } from "@/components/ui/switch";
 import { RecognitionData, useSelectRecognitionModel, useStartRecognition, useStopRecognition } from "@/hooks/api/recognition-service-hooks";
-import { MeetingData, useGetMeetingByMeetingCode } from "@/hooks/api/meeting-service-hooks";
+import { MeetingData, useGetMeetingByMeetingCode, useToggleMutedExtensions } from "@/hooks/api/meeting-service-hooks";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,10 +42,13 @@ export default function MeetingActions({
   meetingCode,
   isEnded
 }: MeetingActionsProps) {
+
   const startRecognition = useStartRecognition();
   const stopRecognition = useStopRecognition();
+ 
   const {
     data: meetingData,
+    refetch: refetchMeeting,
   } = useGetMeetingByMeetingCode(meetingCode);
 
   const [showParticipants, setShowParticipants] = useState(false)
@@ -100,6 +103,7 @@ export default function MeetingActions({
 
   const [selectedModel, setSelectedModel] = useState(meetingData?.data.selectedRecognitionModel || 'NONE');
   const [isRecognitionSwitchedOn, setIsRecognitionSwitchedOn] = useState(meetingData?.data.isRecognitionStarted);
+  // const [toggleMutedState, setToggleMutedState] = useState(meetingData?.data.isMutedAll ?? false); // FAKHRA
 
   useEffect(() => {
     if (selectedModel === 'NONE') {
@@ -207,14 +211,36 @@ export default function MeetingActions({
     }
   };
 
-
-
-
   useEffect(() => {
     handleOnMount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+  //FAKHRA
+  const toggleMutedExtensions = useToggleMutedExtensions();
+  const handleToggleMutedExtensions = () => {
+  // Ambil status saat ini sebelum di-mutate
+  const currentlyMuted = meetingData?.data.isMutedAll ?? false;
+  
+  toggleMutedExtensions.mutate(meetingCode, {
+    onSuccess: () => {
+      // Tampilkan toast berdasarkan status BARU (kebalikan dari status sebelumnya)
+      if (currentlyMuted) {
+        // Jika sebelumnya muted, sekarang unmuted (mati)
+        toast.success("Extensions Unmuted.");
+      } else {
+        // Jika sebelumnya tidak muted, sekarang muted (aktif)
+        toast.success("Extensions Muted (Active).");
+      }
+      // Opsional: refetch data meeting jika diperlukan untuk sinkronisasi UI yang lebih ketat
+      // refetchMeeting(); 
+    },
+    onError: () => {
+      toast.error("Failed to change mute status.");
+    }
+  });
+};
 
   return (
     <>
@@ -244,6 +270,25 @@ export default function MeetingActions({
 
                 <Separator className="dark:bg-neutral-800" />
 
+                {/* Extensions Toggle */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Muted Extensions
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400">Off</span>
+                    <Switch
+                        checked={meetingData?.data.isMutedAll ?? false}
+                        onCheckedChange={handleToggleMutedExtensions}
+                        disabled={toggleMutedExtensions.isPending}
+                      className="data-[state=checked]:bg-sky-600 dark:data-[state=checked]:bg-sky-700"
+                    />
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400">On</span>
+                  </div>
+                </div>
+
+                <Separator className="dark:bg-neutral-800" />
+
                 {/* Recognition Toggle */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -260,6 +305,7 @@ export default function MeetingActions({
                     <span className="text-sm text-neutral-500 dark:text-neutral-400">On</span>
                   </div>
                 </div>
+
 
                 <Separator className="dark:bg-neutral-800" />
                 <div className="flex items-center justify-between">

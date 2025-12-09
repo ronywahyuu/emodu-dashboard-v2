@@ -24,6 +24,9 @@ import NotAuthorizedPageComponent from '../components/not-authorized'
 import { BaseResponse } from '@/constants/types'
 import { useGetClassById } from '@/hooks/api/class-service-hooks'
 import EmovalaroRecognition from '../components/emovalaro-recognition'
+import  UserDetailThread from '../components/user-response-stats'
+import { InterventionPanel } from '../components/intervention-panel'
+
 // import { useGetValenceArousalDataByUser } from '@/hooks/api/valence-arousal-service-hooks'
 
 interface MeetingDetailPageProps {
@@ -221,6 +224,8 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
               <TabsTrigger value="recognition">Recognition (Face-api.js)</TabsTrigger>
               {/* <TabsTrigger value="valencearousal">Valence Arousal Data</TabsTrigger> */}
               <TabsTrigger value="participants">Participants</TabsTrigger>
+              <TabsTrigger value="interactive">Interactive</TabsTrigger>
+
             </TabsList>
             <TabsContent value="recognition">
               {recognitionsDataPending ? (
@@ -263,6 +268,33 @@ function MeetingDetailPage({ params }: MeetingDetailPageProps) {
                 }
                 participants={meetingData?.data.participants as any}
               />
+            </TabsContent>
+            <TabsContent value="interactive">
+              {/* <CardInteractiveIntervention /> */}
+                {/* <div className="min-h-[60vh] flex items-center justify-center">
+                  <p className="text-2xl text-gray-400">Coming Soon...</p>
+                </div> */}
+              <div className="min-h-screen  p-6">
+                  <div className="max-w-7xl mx-auto">
+                    <h1 className="text-3xl font-bold mb-8">Interactive Intervensi</h1>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Chart Section */}
+                       <div className="lg:col-span-1">
+
+                        <InterventionPanel meetingCode={params.meetingId}/>
+
+                      </div>
+                      <div className="lg:col-span-2 space-y-6">
+                        {/* <EmotionChart /> */}
+                        <UserDetailThread meetingCode={params.meetingId} />
+                      </div>
+
+                      {/* Intervention Panel */}
+                     
+                    </div>
+                  </div>
+                </div>
             </TabsContent>
           </Tabs>
         )}

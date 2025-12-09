@@ -19,6 +19,7 @@ export interface MeetingData {
   updatedAt: string
   createdBy: string
   classId: string
+  isMutedAll: boolean
   participants: Participant[]
 }
 
@@ -87,6 +88,40 @@ export const useToggleStartMeeting = () => {
     }
   });
 }
+
+
+//FAKHRA MUTED FUNCTION
+export const useToggleMutedExtensions = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (meetingCode: string) => {
+      const res = await apiClient.patch(`/meetings/muted-extensions/${meetingCode}`);
+      return res.data;
+    },
+    onSuccess: (res, meetingCode) => {
+      // update cache spesifik meeting jika ada
+      queryClient.setQueryData<MeetingDetailResponse>(
+        ["meeting", { meetingCode }],
+        (oldData) => {
+          if (!oldData) return res; // kalau belum ada cache, langsung return hasil baru
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              isMutedAll: res.data.isMutedAll,
+            },
+          };
+        }
+      );
+
+      // invalidate semua meeting biar UI lain juga ikut update
+      queryClient.invalidateQueries({ queryKey: ["meeting"] });
+    },
+  });
+};
+
+
 
 export const useToogleStartRecognition = () => {
   const queryClient = useQueryClient();
