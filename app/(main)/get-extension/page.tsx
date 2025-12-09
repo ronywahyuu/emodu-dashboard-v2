@@ -164,6 +164,8 @@ function GetExtensionPage() {
                   <ul className="list-disc list-inside text-sm text-muted-foreground">
                     <li>Drosiness detection.</li>
                     <li>Monitoring participants.</li>
+                    <li>Interactive Intervention.</li>
+                    <li>Manual Interactive Intervention.</li>
                   </ul>
                 </li>
                 <li>
