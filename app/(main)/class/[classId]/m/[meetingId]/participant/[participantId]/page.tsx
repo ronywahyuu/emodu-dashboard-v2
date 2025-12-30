@@ -6,6 +6,11 @@ import EmovalaroRecognition from '@/app/(main)/class/[classId]/m/components/emov
 
 // Extend MeetingData type to include class for linter fix
 import type { MeetingData as OriginalMeetingData } from '@/hooks/api/meeting-service-hooks';
+
+//confirmed emotion
+import { useGetConfirmationEmotionLogs } from '@/hooks/api/manual-service-hooks';
+import EmotionConfirmationTable from '@/components/charts/confirmed-emotion';
+
 type MeetingData = OriginalMeetingData & { class?: { name?: string } };
 
 const ParticipantEmotionDetailPage = ({ params }: { params: { classId: string; meetingId: string; participantId: string } }) => {
@@ -13,6 +18,13 @@ const ParticipantEmotionDetailPage = ({ params }: { params: { classId: string; m
   const { meetingId, participantId } = params;
 
   const { data, isLoading, error } = useGetMeetingParticipantDetail(meetingId, participantId);
+
+  const { 
+    data: confirmationLogs, 
+    isLoading: isLoadingLogs,
+    error: confirmationError 
+  } = useGetConfirmationEmotionLogs(meetingId, participantId);
+
 
   const participant = data?.data.participant;
   // const recognition = data?.data.recognition;
@@ -92,6 +104,21 @@ const ParticipantEmotionDetailPage = ({ params }: { params: { classId: string; m
           )}
         </div>
       </div>
+      {/* Emotion Confirmation Table hanya untuk FACE_API */}
+      {selectedModel === 'FACE_API' && (
+        <div className="mt-8">
+          <div className="font-semibold mb-2 text-gray-700 text-base md:text-lg px-4 md:px-8">
+            Emotion Confirmation Logs
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+            <EmotionConfirmationTable 
+              data={confirmationLogs || []} 
+              isLoading={isLoadingLogs} 
+            />
+          </div>
+        </div>
+      )}
+
       {/* <div className="mb-4 p-4 border rounded-xl bg-gray-50 shadow w-full max-w-2xl mx-auto">
         <div className="font-semibold text-gray-700 mb-1 text-base md:text-lg">Participant Info</div>
         <div className="text-gray-600 text-sm md:text-base">Email: <span className="font-medium text-gray-800">{participant?.user.email}</span></div>

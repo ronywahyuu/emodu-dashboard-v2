@@ -251,3 +251,55 @@
   //     staleTime: 5000
   //   });
   // }
+
+   export enum EmotionEnum {
+    HAPPY = 'HAPPY',
+    SAD = 'SAD',
+    ANGRY = 'ANGRY',
+    FEARFUL = 'FEARFUL',
+    DISGUSTED = 'DISGUSTED',
+    SURPRISED = 'SURPRISED',
+    NEUTRAL = 'NEUTRAL',
+  }
+
+  export type ConfirmationStatus = EmotionEnum | 'NOT_CONFIRMED' | 'Not Confirmed';
+
+  //intervensi-interaktif (konfirmasi emosi)
+  export interface AffectiveInteractiveTextLog{
+    emotion1: EmotionEnum;
+    emotionValue1: number;
+    emotion2: EmotionEnum;
+    emotionValue2: number;
+    confirmedEmotion: ConfirmationStatus;
+    createdAt: string;
+    confirmedAt: string | null;
+  }
+
+  export interface ConfirmationResponse {
+  success: boolean;
+  message: string;
+  data: AffectiveInteractiveTextLog[];
+}
+
+ export const useGetConfirmationEmotionLogs = (meetingId?: string, participantId?: string) => {
+  return useQuery<AffectiveInteractiveTextLog[], Error>({
+    queryKey: ["confirmation-logs", meetingId, participantId],
+    queryFn: async () => {
+      if (!meetingId || !participantId) {
+        return [];
+      }
+      
+      try {
+        // Option 1: Jika API support meetingId langsung
+        const response = await apiClient.get<ConfirmationResponse>(
+          `/interactive-intervention/${meetingId}/participant/${participantId}`
+        );
+        return response.data.data;
+      } catch (error) {
+        console.error("Error fetching confirmation logs:", error);
+        throw error;
+      }
+    },
+    enabled: !!meetingId && !!participantId,
+  });
+};
