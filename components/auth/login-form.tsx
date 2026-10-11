@@ -19,7 +19,7 @@ import axios from 'axios';
 
 
 const formSchema = z.object({
-  email: z.string().min(3).email(),
+  email: z.string().min(3),
   password: z.string().min(6),
 })
 
@@ -47,7 +47,7 @@ export function LoginForm() {
 
       form.setError('email', {
         type: 'manual',
-        message: `Invalid email or password `
+        message: `Invalid email/NIM or password `
       })
     }
   }
@@ -56,7 +56,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Enter your email or NIM below to login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,9 +69,9 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email / NIM</FormLabel>
                   <FormControl>
-                    <Input placeholder="emodu@example.com" {...field} />
+                    <Input placeholder="emodu@example.com or 235150407111001" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
