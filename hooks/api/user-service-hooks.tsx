@@ -9,6 +9,7 @@ export interface Data {
   id: string
   email: string
   fullname: string
+  nim: string | null
   avatar: string
   isVerified: boolean
   verificationToken: string
@@ -20,6 +21,7 @@ export interface UpdateProfileDto {
   id?: string
   email?: string
   fullName?: string
+  nim?: string
   avatar?: string
   password?: string
 }

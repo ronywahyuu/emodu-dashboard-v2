@@ -22,6 +22,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 const formSchema = z.object({
   fullname: z.string().min(3),
+  nim: z.string().min(1, { message: 'NIM is required' }),
   email: z.string().min(3).email(),
   password: z.string().min(6),
   passwordConfirmation: z.string().min(6),
@@ -32,6 +33,7 @@ export function RegisterForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullname: '',
+      nim: '',
       email: '',
       password: '',
       passwordConfirmation: ''
@@ -51,7 +53,8 @@ export function RegisterForm() {
       const payload = {
         email: values.email,
         password: values.password,
-        fullname: values.fullname
+        fullname: values.fullname,
+        nim: values.nim
       }
       const response = await axios.post(`${BASE_URL}/auth/register`, payload)
       // console.log(response.)
@@ -88,6 +91,19 @@ export function RegisterForm() {
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nim"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>NIM</FormLabel>
+                  <FormControl>
+                    <Input placeholder="235150407111001" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
